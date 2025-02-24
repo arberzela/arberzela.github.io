@@ -1,22 +1,130 @@
 main:
+  - title: "Unlocking State-Tracking in Linear RNNs through Negative Eigenvalues"
+    authors: Riccardo Grazzi*, Julien Siems*, Jörg Franke, Arber Zela, Frank Hutter, Massimiliano Pontil (*equal contribution)
+    conference_short: ICLR (Oral)
+    conference: International Conference on Learning Representation 2025 (Oral)
+    pdf: https://arxiv.org/pdf/2411.12537
+    image: ./assets/img/teaser_negative_eigenvalues.jpg
 
-  - title: Continual Learning for Abdominal Multi-Organ and Tumor Segmentation
-    authors: Yixiao Zhang, Xinyi Li, Huimiao Chen, Alan Yuille, <strong>Yaoyao Liu*</strong>, Zongwei Zhou* (*Corresponding authors)
-    conference_short: MICCAI
-    conference: International Conference on Medical Image Computing and Computer-Assisted Intervention <strong>(MICCAI)</strong>, 2023.
-    pdf: https://arxiv.org/pdf/2306.00988.pdf
-    code: https://github.com/MrGiovanni/ContinualLearning
-    bibtex: https://bib.yliu.me/MICCAI23.txt
-    image: ./assets/img/teaser_example_2.png
-    notes: Early Accept
+  - title: "Multi-objective Differentiable Neural Architecture Search"
+    authors: Rhea Sanjay Sukthanker*, Arber Zela*, Benedikt Staffler, Samuel Dooley, Josif Grabocka, Frank Hutter (*equal contribution)
+    conference_short: ICLR
+    conference: International Conference on Learning Representation 2025 (Poster)
+    pdf: https://arxiv.org/pdf/2402.18213
+    code: https://github.com/automl/MODNAS
+    image: ./assets/img/teaser_negative_eigenvalues.jpg    
 
-  - title: "Mnemonics Training: Multi-Class Incremental Learning without Forgetting"
-    authors: <strong>Yaoyao Liu</strong>, Yuting Su, An-An Liu, Bernt Schiele, Qianru Sun
-    conference_short: CVPR
-    conference: IEEE/CVF Conference on Computer Vision and Pattern Recognition <strong>(CVPR)</strong>, 2020.
-    pdf: https://arxiv.org/pdf/2002.10211.pdf
-    code: https://github.com/yaoyao-liu/class-incremental-learning/tree/main/mnemonics-training
-    page: https://class-il.mpi-inf.mpg.de/mnemonics/
-    bibtex: https://class-il.mpi-inf.mpg.de/mnemonics/
-    notes: Oral Presentation
-    image: ./assets/img/teaser_example.png
+  - title: "GAMformer: In-Context Learning for Generalized Additive Models"
+    authors: Andreas Müller*, Julien Siems*, Harsha Nori, David Salinas, Arber Zela, Rich Caruana, Frank Hutter (*equal contribution)
+    conference_short: TLR@NeurIPS
+    conference: NeurIPS 2024 Workshop on Table Representation Learning
+    pdf: https://arxiv.org/pdf/2410.04560
+    image: ./assets/img/teaser_gamformer.jpg
+
+  - title: "Ensembling Finetuned Language Models for Text Classification"
+    authors: Sebastian Pineda Arango, Maciej Janowski, Lennart Purucker, Arber Zela, Frank Hutter, Josif Grabocka
+    conference_short: FITML@NeurIPS
+    conference: NeurIPS 2024 Workshop on Fine-Tuning in Machine Learning
+    pdf: https://arxiv.org/pdf/2410.19889
+    image: ./assets/img/teaser_gamformer.jpg
+
+  - title: "HW-GPT-Bench: Hardware-Aware Architecture Benchmark for Language Models"
+    authors: Rhea Sanjay Sukthanker, Arber Zela, Benedikt Staffler, Aaron Klein, Lennart Purucker, Jörg KH Franke, Frank Hutter
+    conference_short: NeurIPS DBT
+    conference: Advances in Neural Information Processing Systems 2024, Datasets and Benchmarks Track
+    pdf: https://arxiv.org/pdf/2405.10299
+    code: https://github.com/automl/HW-GPT-Bench/
+    image: ./assets/img/teaser_nb_301.png
+
+  - title: "Neural architecture search for dense prediction tasks in computer vision"
+    authors: Rohit Mohan, Thomas Elsken, Arber Zela, Jan Hendrik Metzen, Benedikt Staffler, Thomas Brox, Abhinav Valada, Frank Hutter
+    conference_short: IJCV
+    conference: International Journal of Computer Vision 2023
+    link: https://link.springer.com/article/10.1007/s11263-023-01785-y
+    image: ./assets/img/teaser_nb_301.png
+
+  - title: "NAS-Bench-Suite: NAS Evaluation is (Now) Surprisingly Easy"
+    authors: Yash Mehta*, Colin White*, Arber Zela, Arjun Krishnakumar, Guri Zabergja, Shakiba Moradian, Mahmoud Safari, Kaicheng Yu, Frank Hutter (*equal contribution)
+    conference_short: ICLR
+    conference: International Conference on Learning Representation 2022
+    pdf: https://arxiv.org/pdf/2201.13396
+    code: https://github.com/automl/naslib
+    image: ./assets/img/teaser_nb_301.png
+
+  - title: "NAS-Bench-Suite-Zero: Accelerating Research on Zero Cost Proxies"
+    authors: Arjun Krishnakumar*, Colin White*, Arber Zela*, Renbo Tu, Mahmoud Safari, Frank Hutter (*equal contribution)
+    conference_short: NeurIPS DBT
+    conference: Advances in Neural Information Processing Systems 2022, Datasets and Benchmarks Track
+    pdf: https://arxiv.org/pdf/2210.03230
+    code: https://github.com/automl/NASLib/tree/zerocost
+    image: ./assets/img/teaser_nb_301.png
+
+  - title: "JAHS-Bench-201: A Foundation For Research On Joint Architecture And Hyperparameter Search"
+    authors: Archit Bansal, Danny Stoll, Maciej Janowski, Arber Zela, Frank Hutter
+    conference_short: NeurIPS DBT
+    conference: Advances in Neural Information Processing Systems 2022, Datasets and Benchmarks Track
+    pdf: https://openreview.net/pdf?id=_HLcjaVlqJ
+    code: https://github.com/automl/jahs_bench_201
+    image: ./assets/img/teaser_nb_301.png
+
+  - title: "Surrogate NAS Benchmarks: Going Beyond the Limited Search Spaces of Tabular NAS Benchmarks"
+    authors: Arber Zela*, Julien Siems*, Lucas Zimmer*, Jovita Lukasik, Margret Keuper, Frank Hutter (*equal contribution)
+    conference_short: ICLR
+    conference: International Conference on Learning Representation 2022
+    pdf: https://arxiv.org/pdf/2008.09777
+    code: https://github.com/automl/nasbench301
+    image: ./assets/img/teaser_nb_301.png
+
+  - title: "Neural Ensemble Search for Uncertainty Estimation and Dataset Shift"
+    authors: Sheheryar Zaidi*, Arber Zela*, Thomas Elsken, Chris C Holmes, Frank Hutter, Yee Whye Teh (*equal contribution)
+    conference_short: NeurIPS
+    conference: Advances in Neural Information Processing Systems 2021
+    pdf: https://arxiv.org/pdf/2006.08573
+    code: https://github.com/automl/nes
+    image: ./assets/img/teaser_nb_301.png
+
+  - title: "How Powerful are Performance Predictors in Neural Architecture Search?"
+    authors: Colin White, Arber Zela, Binxin Ru, Yang Liu, Frank Hutter
+    conference_short: NeurIPS
+    conference: Advances in Neural Information Processing Systems 2021
+    pdf: https://arxiv.org/pdf/2104.01177
+    code: https://github.com/automl/naslib
+    image: ./assets/img/teaser_nb_301.png
+
+  - title: "Multi-headed Neural Ensemble Search"
+    authors: Ashwin Raaghav Narayanan, Arber Zela, Tonmoy Saikia, Thomas Brox, Frank Hutter
+    conference_short: UDL@ICML 2021
+    conference: ICML 2021 Workshop on Uncertainty and Robustness in Deep Learning 
+    pdf: https://arxiv.org/pdf/2107.04369
+    image: ./assets/img/teaser_gamformer.jpg
+
+  - title: "Smooth Variational Graph Embeddings for Efficient Neural Architecture Search"
+    authors: Jovita Lukasik, David Friede, Arber Zela, Frank Hutter, Margret Keuper
+    conference_short: IJCNN
+    conference: International Joint Conference on Neural Networks 2021
+    pdf: https://arxiv.org/pdf/2010.04683
+    image: ./assets/img/teaser_nb_1shot1.png
+
+  - title: "NAS-Bench-1Shot1: Benchmarking and dissecting one-shot neural architecture search"
+    authors: Arber Zela*, Julien Siems*, Frank Hutter (*equal contribution)
+    conference_short: ICLR
+    conference: International Conference on Learning Representation 2020
+    pdf: https://arxiv.org/pdf/2008.09777
+    code: https://github.com/automl/nasbench-1shot1
+    image: ./assets/img/teaser_nb_1shot1.png
+
+  - title: "Understanding and Robustifying Differentiable Architecture Search"
+    authors: Arber Zela, Thomas Elsken, Tonmoy Saikia, Yassine Marrakchi, Thomas Brox, Frank Hutter
+    conference_short: ICLR (Oral)
+    conference: International Conference on Learning Representation 2020 (Oral)
+    pdf: https://arxiv.org/pdf/1909.09656
+    code: https://github.com/automl/RobustDARTS
+    image: ./assets/img/teaser_nb_1shot1.png
+
+  - title: "AutoDispNet: Improving Disparity Estimation With AutoML"
+    authors: Tonmoy Saikia, Yassine Marrakchi, Arber Zela, Frank Hutter, Thomas Brox
+    conference_short: ICCV
+    conference: International Conference on Computer Vision 2019
+    pdf: https://arxiv.org/pdf/1905.07443
+    code: https://github.com/lmb-freiburg/autodispnet
+    image: ./assets/img/teaser_nb_1shot1.png
