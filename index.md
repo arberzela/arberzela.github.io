@@ -24,5 +24,3 @@ I am a Ph.D. student at the University of Freiburg advised by Prof. Frank Hutter
 - **[Mar. 2024]** "Multi-objective Differentiable Neural Architecture Search" at the AutoML Seminars ([Youtube](https://www.youtube.com/watch?v=649r1j31RbU)) ([Slides](assets/files/slides/MODNAS.pdf))
 
 {% include_relative _includes/publications.md %}
-
-{% include_relative _includes/services.md %}
