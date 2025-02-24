@@ -20,7 +20,7 @@ I am a Ph.D. student at the University of Freiburg advised by Prof. Frank Hutter
 - **[Jul. 2023]** "Neural architecture search for dense prediction tasks in computer vision" published at IJCV.
 
 ## Recent Seminars / Lectures
-- **[Nov. 2024]** "Searching for Calibrated, Efficient, and Expressive Neural Networks" at University of Basel ([Slides](assets/files/slides/talk_basel.pdf))
-- **[Mar. 2024]** "Multi-objective Differentiable Neural Architecture Search" at the AutoML Seminars ([Youtube](https://www.youtube.com/watch?v=649r1j31RbU)) ([Slides](assets/files/slides/MODNAS.pdf))
+- **[Nov. 2024]** "Searching for Calibrated, Efficient, and Expressive Neural Networks" at University of Basel ([Slides](assets/files/talk_basel.pdf))
+- **[Mar. 2024]** "Multi-objective Differentiable Neural Architecture Search" at the AutoML Seminars ([Youtube](https://www.youtube.com/watch?v=649r1j31RbU)) ([Slides](assets/files/MODNAS.pdf))
 
 {% include_relative _includes/publications.md %}
