@@ -19,7 +19,7 @@ I am a Ph.D. student at the University of Freiburg advised by Prof. Frank Hutter
 - **[Jun. 2024]** "Multi-objective Differentiable Neural Architecture Search" was accepted to the WANT workshop at ICML 2024.
 - **[Jul. 2023]** "Neural architecture search for dense prediction tasks in computer vision" published at IJCV.
 
-## Recent Seminars / Lectures
+## Recent Talks / Seminars
 - **[Nov. 2024]** "Searching for Calibrated, Efficient, and Expressive Neural Networks" at University of Basel ([Slides](assets/files/talk_basel.pdf))
 - **[Mar. 2024]** "Multi-objective Differentiable Neural Architecture Search" at the AutoML Seminars ([Youtube](https://www.youtube.com/watch?v=649r1j31RbU)) ([Slides](assets/files/MODNAS.pdf))
 
