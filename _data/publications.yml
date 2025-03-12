@@ -1,4 +1,11 @@
 main:
+  - title: "DeltaProduct: Increasing the Expressivity of DeltaNet Through Products of Householders"
+    authors: Julien Siems*, Timur Carstensen*, Arber Zela, Frank Hutter, Massimiliano Pontil, Riccardo Grazzi* (*equal contribution)
+    conference_short: FM-Wild@ICLR
+    conference: ICLR Workshop on Foundations Models in the Wild
+    pdf: https://arxiv.org/abs/2502.10297
+    image: ./assets/img/teaser_deltaproduct.png
+
   - title: "Unlocking State-Tracking in Linear RNNs through Negative Eigenvalues"
     authors: Riccardo Grazzi*, Julien Siems*, Jörg Franke, Arber Zela, Frank Hutter, Massimiliano Pontil (*equal contribution)
     conference_short: ICLR (Oral)
