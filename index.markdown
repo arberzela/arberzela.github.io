@@ -10,9 +10,11 @@ I am a Ph.D. student at the University of Freiburg advised by Prof. Frank Hutter
 
 - **Neural Architecture Search:** multi-objective optimization, structural pruning, benchmarking
 - **In-Context Learning:** Linear RNNs, Reasoning, Test-Time Scaling
+- **Global Optimization:** Bayesian Optimization, Bandits
 
 ## News
 
+- **[May 2025]** "Regularized Neural Ensemblers" is accepted at AutoML Conference 2025.
 - **[Mar. 2025]** "DeltaProduct: Increasing the Expressivity of DeltaNet Through Products of Householders" is accepted at FM-WILD Workshop at ICLR 2025 as an Oral.
 - **[Feb. 2025]** 2 papers accepted at ICLR 2025. "Multi-objective Differentiable Neural Architecture Search" as a Poster and "Unlocking State-Tracking in Linear RNNs Through Negative Eigenvalues" as an Oral.
 - **[Oct. 2024]** 3 papers accepted at NeurIPS 2024 workshops: "Unlocking State-Tracking in Linear RNNs Through Negative Eigenvalues" (Oral), "GAMformer" (Poster), and "Ensembling Finetuned Language Models for Text Classification" (Poster).

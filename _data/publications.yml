@@ -1,4 +1,11 @@
 main:
+  - title: "Regularized Neural Ensemblers"
+    authors: Sebastian Pineda Arango*, Maciej Janowski*, Lennart Purucker, Arber Zela, Frank Hutter, Josif Grabocka (*equal contribution)
+    conference_short: AutoML-Conf
+    conference: AutoML Conference 2025
+    pdf: ./assets/files/Neural_Ensemblers_Automlconf2025.pdf
+    image: ./assets/img/teaser_regens.png
+
   - title: "DeltaProduct: Increasing the Expressivity of DeltaNet Through Products of Householders"
     authors: Julien Siems*, Timur Carstensen*, Arber Zela, Frank Hutter, Massimiliano Pontil, Riccardo Grazzi* (*equal contribution)
     conference_short: FM-Wild@ICLR
