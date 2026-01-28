@@ -1,17 +1,32 @@
 main:
+    - title: "Improving LLM-based Global Optimization with Search Space Partitioning"
+    authors: Andrej Schwanke*, Lyubomir Ivanov*, David Salinas, Fabio Ferreira, Aaron Klein, Frank Hutter, Arber Zela* (*equal contribution)
+    conference_short: ICLR
+    conference: International Conference on Learning Representation 2026
+    pdf: https://arxiv.org/pdf/2505.21372
+    code: https://github.com/arberzela/mohollm
+    image: ./assets/img/teaser_holllm.png
+
+  - title: "DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products"
+    authors: Julien Siems*, Timur Carstensen*, Arber Zela, Frank Hutter, Massimiliano Pontil, Riccardo Grazzi* (*equal contribution)
+    conference_short: NeurIPS
+    conference: Advances in Neural Information Processing Systems 2025
+    pdf: https://arxiv.org/abs/2502.10297
+    image: ./assets/img/teaser_deltaproduct.png
+
+  - title: "TempoPFN: Towards Synthetic Pre-training of Linear RNNs for Zero-shot Time Series Forecasting"
+    authors: Vladyslav Moroshan*, Julien Siems*, Arber Zela, Timur Carstensen, Frank Hutter (*equal contribution)
+    conference_short: AITD@EurIPS
+    conference: EurIPS 2025 Workshop on AI for Tabular Data
+    pdf: https://arxiv.org/pdf/2510.25502
+    image: ./assets/img/teaser_tempopfn.png
+
   - title: "Regularized Neural Ensemblers"
     authors: Sebastian Pineda Arango*, Maciej Janowski*, Lennart Purucker, Arber Zela, Frank Hutter, Josif Grabocka (*equal contribution)
     conference_short: AutoML-Conf
     conference: AutoML Conference 2025
     pdf: ./assets/files/Neural_Ensemblers_Automlconf2025.pdf
     image: ./assets/img/teaser_regens.png
-
-  - title: "DeltaProduct: Increasing the Expressivity of DeltaNet Through Products of Householders"
-    authors: Julien Siems*, Timur Carstensen*, Arber Zela, Frank Hutter, Massimiliano Pontil, Riccardo Grazzi* (*equal contribution)
-    conference_short: FM-Wild@ICLR
-    conference: ICLR Workshop on Foundations Models in the Wild (Oral)
-    pdf: https://arxiv.org/abs/2502.10297
-    image: ./assets/img/teaser_deltaproduct.png
 
   - title: "Unlocking State-Tracking in Linear RNNs through Negative Eigenvalues"
     authors: Riccardo Grazzi*, Julien Siems*, Jörg Franke, Arber Zela, Frank Hutter, Massimiliano Pontil (*equal contribution)
@@ -27,6 +42,12 @@ main:
     pdf: https://arxiv.org/pdf/2402.18213
     code: https://github.com/automl/MODNAS
     image: ./assets/img/teaser_modnas.png
+
+  - title: "Toward Artificial Intelligence in Oncology and Cardiology: A Narrative Review of Systems, Challenges, and Opportunities"
+    authors: Visar Vela, Ali Yasin Sonay, Perparim Limani, Lukas Graf, Besmira Sabani, Diona Gjermeni, Andi Rroku, Arber Zela, Era Gorica, Hector Rodriguez Cetina Biefer, Uljad Berdica, Euxhen Hasanaj, Adisa Trnjanin, Taulant Muka, Omer Dzemali
+    conference_short: JCM
+    conference: Journal of Clinical Medicine 14(21), 2025
+    pdf: https://pmc.ncbi.nlm.nih.gov/articles/PMC12610105/pdf/jcm-14-07555.pdf
 
   - title: "GAMformer: In-Context Learning for Generalized Additive Models"
     authors: Andreas Müller*, Julien Siems*, Harsha Nori, David Salinas, Arber Zela, Rich Caruana, Frank Hutter (*equal contribution)

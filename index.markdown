@@ -4,16 +4,20 @@ layout: homepage
 
 ## About Me
 
-I am a Ph.D. student at the University of Freiburg advised by Prof. Frank Hutter. Since 2020 I am also an ELLIS PhD student co-advised by Prof. Yee Whye Teh at the University of Oxford. I am currently living close to Basel, Switzerland and working in Freiburg, Germany.
+I am a Postdoctoral Researcher at the ELLIS Insitute Tübingen, Germany. Before I was an ELLIS Ph.D. student at the University of Freiburg advised by Frank Hutter and co-advised by Yee Whye Teh at the University of Oxford. Since 2025 I am also an ELLIS member.
 
 ## Research Interests
 
-- **Neural Architecture Search:** multi-objective optimization, structural pruning, benchmarking
+- **AutoML:** Neural Architecture Search, Structural Pruning, Benchmarking
 - **In-Context Learning:** Linear RNNs, Reasoning, Test-Time Scaling
-- **Global Optimization:** Bayesian Optimization, Bandits
+- **Global Optimization:** Bayesian Optimization, Multi-objective Optimization, Bandits
 
 ## News
 
+- **[Jan. 2026]** "Improving LLM-based Global Optimization with Search Space Partitioning" is accepted at ICLR 2026.
+- **[Nov. 2025]** "TempoPFN: Towards Synthetic Pre-training of Linear RNNs for Zero-shot Time Series Forecasting" is accepted at AITD@EurIPS 2025.
+- **[Oct. 2025]** I successfully defended my PhD Thesis with summa cum laude.
+- **[Sep. 2025]** "DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products" is accepted at NeurIPS 2025.
 - **[May 2025]** "Regularized Neural Ensemblers" is accepted at AutoML Conference 2025.
 - **[Mar. 2025]** "DeltaProduct: Increasing the Expressivity of DeltaNet Through Products of Householders" is accepted at FM-WILD Workshop at ICLR 2025 as an Oral.
 - **[Feb. 2025]** 2 papers accepted at ICLR 2025. "Multi-objective Differentiable Neural Architecture Search" as a Poster and "Unlocking State-Tracking in Linear RNNs Through Negative Eigenvalues" as an Oral.
