@@ -9,7 +9,7 @@ I am a Postdoctoral Researcher at the ELLIS Insitute Tübingen, Germany. Before 
 ## Research Interests
 
 - **AutoML:** Neural Architecture Search, Structural Pruning, Benchmarking
-- **In-Context Learning:** Linear RNNs, Reasoning, Test-Time Scaling
+- **In-Context Learning:** Linear RNNs, Reasoning, Tabular and Time-Series Foundation Models
 - **Global Optimization:** Bayesian Optimization, Multi-objective Optimization, Bandits
 
 ## News
