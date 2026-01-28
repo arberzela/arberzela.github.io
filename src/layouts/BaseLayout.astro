@@ -1,0 +1,132 @@
+---
+import { siteConfig } from '../config';
+import '../styles/style.scss';
+import '../styles/publications.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = siteConfig.title, description = siteConfig.description } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{title} | {siteConfig.affiliation}</title>
+    
+    <meta name="description" content={description}>
+    <meta name="keywords" content={siteConfig.keywords}>
+    
+    <!-- Favicons -->
+    <link rel="icon" media="(prefers-color-scheme:dark)" href={siteConfig.faviconDark} type="image/png" />
+    <link rel="icon" media="(prefers-color-scheme:light)" href={siteConfig.favicon} type="image/png" />
+    
+    <!-- Academic Icons & Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Fonts -->
+    {siteConfig.font === "Sans Serif" ? (
+      <link rel="stylesheet" href="/assets/css/font_sans_serif.css">
+    ) : (
+      <link rel="stylesheet" href="/assets/css/font.css">
+    )}
+    
+    <script is:inline src="/assets/js/favicon-switcher.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header id="header">
+        {siteConfig.avatar && (
+          <a class="image avatar"><img src={siteConfig.avatar} alt="avatar" /></a>
+        )}
+        
+        <h1>{siteConfig.title}</h1>
+        
+        {siteConfig.position && (
+          <>
+            <position style="font-size:1.10rem;">{siteConfig.position}</position>
+            <br>
+          </>
+        )}
+        
+        {siteConfig.affiliation && (
+          <>
+            <a href="#" rel="noopener"><autocolor>{siteConfig.affiliation}</autocolor></a>
+            <br>
+          </>
+        )}
+        
+        {siteConfig.email && (
+          <email>{siteConfig.email}</email>
+        )}
+        
+        <br>
+        <br>
+        
+        <div class="social-icons">
+          {siteConfig.googleScholar && (
+            <a style="margin: 0 5px 0 0" href={siteConfig.googleScholar}>
+              <i class="ai ai-google-scholar" style="font-size:1.2rem"></i>
+            </a>
+          )}
+          
+          {siteConfig.cvLink && (
+            <a style="margin: 0 5px 0 0" href={siteConfig.cvLink}>
+              <i class="ai ai-cv" style="font-size:1.3rem;"></i>
+            </a>
+          )}
+          
+          {siteConfig.githubLink && (
+            <a style="margin: 0 5px 0 0" href={siteConfig.githubLink}>
+              <i class="fab fa-github"></i>
+            </a>
+          )}
+          
+          {siteConfig.linkedin && (
+            <a style="margin: 0 5px 0 0" href={siteConfig.linkedin}>
+              <i class="fab fa-linkedin"></i>
+            </a>
+          )}
+          
+          {siteConfig.twitter && (
+            <a style="margin: 0 0 0 0" href={siteConfig.twitter}>
+              <i class="fab fa-x-twitter"></i>
+            </a>
+          )}
+        </div>
+        <br>
+      </header>
+      
+      <section>
+        <slot />
+        
+        <br>
+        
+        {siteConfig.enableFootnote && (
+          <p><small>Powered by Astro and <a href="https://github.com/yaoyao-liu/minimal-light" target="_blank" rel="noopener">Minimal Light</a> theme.</small></p>
+        )}
+      </section>
+      
+      <footer></footer>
+    </div>
+    
+    <script is:inline src="/assets/js/scale.fix.js"></script>
+    
+    {siteConfig.googleAnalytics && (
+      <script is:inline define:vars={{ ga: siteConfig.googleAnalytics }}>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        ga('create', ga, 'auto');
+        ga('send', 'pageview');
+      </script>
+    )}
+  </body>
+</html>
