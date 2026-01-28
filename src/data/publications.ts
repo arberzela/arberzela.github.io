@@ -21,7 +21,7 @@ export const publications: Publication[] = [
         conference: "International Conference on Learning Representation 2026",
         pdf: "https://arxiv.org/pdf/2505.21372",
         code: "https://github.com/arberzela/mohollm",
-        image: "./assets/img/teaser_hollm.png"
+        image: "/assets/img/teaser_hollm.png"
     },
     {
         title: "DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products",
@@ -29,7 +29,7 @@ export const publications: Publication[] = [
         conference_short: "NeurIPS",
         conference: "Advances in Neural Information Processing Systems 2025",
         pdf: "https://arxiv.org/abs/2502.10297",
-        image: "./assets/img/teaser_deltaproduct.png"
+        image: "/assets/img/teaser_deltaproduct.png"
     },
     {
         title: "TempoPFN: Towards Synthetic Pre-training of Linear RNNs for Zero-shot Time Series Forecasting",
@@ -37,15 +37,15 @@ export const publications: Publication[] = [
         conference_short: "AITD@EurIPS",
         conference: "EurIPS 2025 Workshop on AI for Tabular Data",
         pdf: "https://arxiv.org/pdf/2510.25502",
-        image: "./assets/img/teaser_tempopfn.png"
+        image: "/assets/img/teaser_tempopfn.png"
     },
     {
         title: "Regularized Neural Ensemblers",
         authors: "Sebastian Pineda Arango*, Maciej Janowski*, Lennart Purucker, Arber Zela, Frank Hutter, Josif Grabocka (*equal contribution)",
         conference_short: "AutoML-Conf",
         conference: "AutoML Conference 2025",
-        pdf: "./assets/files/Neural_Ensemblers_Automlconf2025.pdf",
-        image: "./assets/img/teaser_regens.png"
+        pdf: "/assets/files/Neural_Ensemblers_Automlconf2025.pdf",
+        image: "/assets/img/teaser_regens.png"
     },
     {
         title: "Unlocking State-Tracking in Linear RNNs through Negative Eigenvalues",
@@ -53,7 +53,7 @@ export const publications: Publication[] = [
         conference_short: "ICLR (Oral)",
         conference: "International Conference on Learning Representation 2025 (Oral)",
         pdf: "https://arxiv.org/pdf/2411.12537",
-        image: "./assets/img/teaser_negative_eigenvalues.jpg"
+        image: "/assets/img/teaser_negative_eigenvalues.jpg"
     },
     {
         title: "Multi-objective Differentiable Neural Architecture Search",
@@ -62,7 +62,7 @@ export const publications: Publication[] = [
         conference: "International Conference on Learning Representation 2025 (Poster)",
         pdf: "https://arxiv.org/pdf/2402.18213",
         code: "https://github.com/automl/MODNAS",
-        image: "./assets/img/teaser_modnas.png"
+        image: "/assets/img/teaser_modnas.png"
     },
     {
         title: "Toward Artificial Intelligence in Oncology and Cardiology: A Narrative Review of Systems, Challenges, and Opportunities",
@@ -70,7 +70,7 @@ export const publications: Publication[] = [
         conference_short: "JCM",
         conference: "Journal of Clinical Medicine 14(21), 2025",
         pdf: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12610105/pdf/jcm-14-07555.pdf",
-        image: "./assets/img/teaser_ai_oncology.png"
+        image: "/assets/img/teaser_ai_oncology.png"
     },
     {
         title: "GAMformer: In-Context Learning for Generalized Additive Models",
@@ -78,7 +78,7 @@ export const publications: Publication[] = [
         conference_short: "TLR@NeurIPS",
         conference: "NeurIPS 2024 Workshop on Table Representation Learning",
         pdf: "https://arxiv.org/pdf/2410.04560",
-        image: "./assets/img/teaser_gamformer.jpg"
+        image: "/assets/img/teaser_gamformer.jpg"
     },
     {
         title: "Ensembling Finetuned Language Models for Text Classification",
@@ -86,7 +86,7 @@ export const publications: Publication[] = [
         conference_short: "FITML@NeurIPS",
         conference: "NeurIPS 2024 Workshop on Fine-Tuning in Machine Learning",
         pdf: "https://arxiv.org/pdf/2410.19889",
-        image: "./assets/img/teaser_tunelm.png"
+        image: "/assets/img/teaser_tunelm.png"
     },
     {
         title: "HW-GPT-Bench: Hardware-Aware Architecture Benchmark for Language Models",
@@ -95,7 +95,7 @@ export const publications: Publication[] = [
         conference: "Advances in Neural Information Processing Systems 2024, Datasets and Benchmarks Track",
         pdf: "https://arxiv.org/pdf/2405.10299",
         code: "https://github.com/automl/HW-GPT-Bench/",
-        image: "./assets/img/teaser_hwgpt.png"
+        image: "/assets/img/teaser_hwgpt.png"
     },
     {
         title: "Neural architecture search for dense prediction tasks in computer vision",
@@ -103,7 +103,7 @@ export const publications: Publication[] = [
         conference_short: "IJCV",
         conference: "International Journal of Computer Vision 2023",
         link: "https://link.springer.com/article/10.1007/s11263-023-01785-y",
-        image: "./assets/img/teaser_surveycv.png"
+        image: "/assets/img/teaser_surveycv.png"
     },
     {
         title: "NAS-Bench-Suite: NAS Evaluation is (Now) Surprisingly Easy",
@@ -112,7 +112,7 @@ export const publications: Publication[] = [
         conference: "International Conference on Learning Representation 2022",
         pdf: "https://arxiv.org/pdf/2201.13396",
         code: "https://github.com/automl/naslib",
-        image: "./assets/img/teaser_nbsuite.png"
+        image: "/assets/img/teaser_nbsuite.png"
     },
     {
         title: "NAS-Bench-Suite-Zero: Accelerating Research on Zero Cost Proxies",
@@ -121,7 +121,7 @@ export const publications: Publication[] = [
         conference: "Advances in Neural Information Processing Systems 2022, Datasets and Benchmarks Track",
         pdf: "https://arxiv.org/pdf/2210.03230",
         code: "https://github.com/automl/NASLib/tree/zerocost",
-        image: "./assets/img/teaser_nbsuite0.png"
+        image: "/assets/img/teaser_nbsuite0.png"
     },
     {
         title: "JAHS-Bench-201: A Foundation For Research On Joint Architecture And Hyperparameter Search",
@@ -130,7 +130,7 @@ export const publications: Publication[] = [
         conference: "Advances in Neural Information Processing Systems 2022, Datasets and Benchmarks Track",
         pdf: "https://openreview.net/pdf?id=_HLcjaVlqJ",
         code: "https://github.com/automl/jahs_bench_201",
-        image: "./assets/img/teaser_jahs.png"
+        image: "/assets/img/teaser_jahs.png"
     },
     {
         title: "Surrogate NAS Benchmarks: Going Beyond the Limited Search Spaces of Tabular NAS Benchmarks",
@@ -139,7 +139,7 @@ export const publications: Publication[] = [
         conference: "International Conference on Learning Representation 2022",
         pdf: "https://arxiv.org/pdf/2008.09777",
         code: "https://github.com/automl/nasbench301",
-        image: "./assets/img/teaser_nb_301.png"
+        image: "/assets/img/teaser_nb_301.png"
     },
     {
         title: "Neural Ensemble Search for Uncertainty Estimation and Dataset Shift",
@@ -148,7 +148,7 @@ export const publications: Publication[] = [
         conference: "Advances in Neural Information Processing Systems 2021",
         pdf: "https://arxiv.org/pdf/2006.08573",
         code: "https://github.com/automl/nes",
-        image: "./assets/img/teaser_nes.png"
+        image: "/assets/img/teaser_nes.png"
     },
     {
         title: "How Powerful are Performance Predictors in Neural Architecture Search?",
@@ -157,7 +157,7 @@ export const publications: Publication[] = [
         conference: "Advances in Neural Information Processing Systems 2021",
         pdf: "https://arxiv.org/pdf/2104.01177",
         code: "https://github.com/automl/naslib",
-        image: "./assets/img/teaser_predictors.png"
+        image: "/assets/img/teaser_predictors.png"
     },
     {
         title: "Multi-headed Neural Ensemble Search",
@@ -165,7 +165,7 @@ export const publications: Publication[] = [
         conference_short: "UDL@ICML 2021",
         conference: "ICML 2021 Workshop on Uncertainty and Robustness in Deep Learning",
         pdf: "https://arxiv.org/pdf/2107.04369",
-        image: "./assets/img/teaser_mhnes.png"
+        image: "/assets/img/teaser_mhnes.png"
     },
     {
         title: "Smooth Variational Graph Embeddings for Efficient Neural Architecture Search",
@@ -173,7 +173,7 @@ export const publications: Publication[] = [
         conference_short: "IJCNN",
         conference: "International Joint Conference on Neural Networks 2021",
         pdf: "https://arxiv.org/pdf/2010.04683",
-        image: "./assets/img/teaser_svge.png"
+        image: "/assets/img/teaser_svge.png"
     },
     {
         title: "NAS-Bench-1Shot1: Benchmarking and dissecting one-shot neural architecture search",
@@ -182,7 +182,7 @@ export const publications: Publication[] = [
         conference: "International Conference on Learning Representation 2020",
         pdf: "https://arxiv.org/pdf/2008.09777",
         code: "https://github.com/automl/nasbench-1shot1",
-        image: "./assets/img/teaser_nb_1shot1.png"
+        image: "/assets/img/teaser_nb_1shot1.png"
     },
     {
         title: "Understanding and Robustifying Differentiable Architecture Search",
@@ -191,7 +191,7 @@ export const publications: Publication[] = [
         conference: "International Conference on Learning Representation 2020 (Oral)",
         pdf: "https://arxiv.org/pdf/1909.09656",
         code: "https://github.com/automl/RobustDARTS",
-        image: "./assets/img/teaser_rdarts.png"
+        image: "/assets/img/teaser_rdarts.png"
     },
     {
         title: "AutoDispNet: Improving Disparity Estimation With AutoML",
@@ -200,6 +200,6 @@ export const publications: Publication[] = [
         conference: "International Conference on Computer Vision 2019",
         pdf: "https://arxiv.org/pdf/1905.07443",
         code: "https://github.com/lmb-freiburg/autodispnet",
-        image: "./assets/img/teaser_dispnet.png"
+        image: "/assets/img/teaser_dispnet.png"
     }
 ];
