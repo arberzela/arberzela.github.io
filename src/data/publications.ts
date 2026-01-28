@@ -21,7 +21,7 @@ export const publications: Publication[] = [
         conference: "International Conference on Learning Representation 2026",
         pdf: "https://arxiv.org/pdf/2505.21372",
         code: "https://github.com/arberzela/mohollm",
-        image: "./assets/img/teaser_holllm.png"
+        image: "./assets/img/teaser_hollm.png"
     },
     {
         title: "DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products",
@@ -69,7 +69,8 @@ export const publications: Publication[] = [
         authors: "Visar Vela, Ali Yasin Sonay, Perparim Limani, Lukas Graf, Besmira Sabani, Diona Gjermeni, Andi Rroku, Arber Zela, Era Gorica, Hector Rodriguez Cetina Biefer, Uljad Berdica, Euxhen Hasanaj, Adisa Trnjanin, Taulant Muka, Omer Dzemali",
         conference_short: "JCM",
         conference: "Journal of Clinical Medicine 14(21), 2025",
-        pdf: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12610105/pdf/jcm-14-07555.pdf"
+        pdf: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12610105/pdf/jcm-14-07555.pdf",
+        image: "./assets/img/teaser_ai_oncology.png"
     },
     {
         title: "GAMformer: In-Context Learning for Generalized Additive Models",
