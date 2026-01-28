@@ -5,7 +5,7 @@ main:
     conference: International Conference on Learning Representation 2026
     pdf: https://arxiv.org/pdf/2505.21372
     code: https://github.com/arberzela/mohollm
-    image: ./assets/img/teaser_holllm.png
+    image: ./assets/img/teaser_hollm.png
 
   - title: "DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products"
     authors: Julien Siems*, Timur Carstensen*, Arber Zela, Frank Hutter, Massimiliano Pontil, Riccardo Grazzi* (*equal contribution)
