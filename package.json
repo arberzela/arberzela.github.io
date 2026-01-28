@@ -1,0 +1,18 @@
+{
+  "name": "arberzela-homepage",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.16.16"
+  },
+  "devDependencies": {
+    "@astrojs/sitemap": "^3.2.2",
+    "sass": "^1.97.3"
+  }
+}
