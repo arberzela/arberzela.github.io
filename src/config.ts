@@ -1,8 +1,8 @@
 export const siteConfig = {
     title: "Arber Zela",
     position: "Postdoctoral Researcher",
-    affiliation: "ELLIS Institute Tübingen",
-    email: "arber.zela (at) tue.ellis.eu",
+    affiliation: "Ecole Polytechnique Fédérale de Lausanne (EPFL)",
+    email: "arber.zela (at) epfl.ch",
 
     // SEO
     keywords: "minimal light",
