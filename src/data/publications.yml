@@ -1,4 +1,12 @@
 main:
+    - title: "Evolving Many Worlds: Towards Open-Ended Discovery in Petri Dish NCA via Population-Based Training"
+    authors: Uljad Berdica*, Jakob Foerster, Frank Hutter, Arber Zela* (*equal contribution)
+    conference_short: ALIFE 2026
+    conference: The 2026 Artificial Life Conference
+    pdf: https://arxiv.org/pdf/2604.11248
+    code: https://github.com/arberzela/pbt-nca
+    image: ./assets/img/teaser_hollm.png
+
     - title: "Improving LLM-based Global Optimization with Search Space Partitioning"
     authors: Andrej Schwanke*, Lyubomir Ivanov*, David Salinas, Fabio Ferreira, Aaron Klein, Frank Hutter, Arber Zela* (*equal contribution)
     conference_short: ICLR
