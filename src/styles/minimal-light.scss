@@ -502,7 +502,7 @@ html.js.reveal-all .section-head::after { transform: scaleX(1); }
 
 .lead { margin: 0; font-size: 1.12rem; line-height: 1.7; color: var(--text-2); }
 
-// Reusable pill button (talk links, publication links, "show more").
+// Reusable pill button (publication links, "show more").
 .pill {
   display: inline-flex;
   align-items: center;
@@ -651,29 +651,6 @@ html.js .timeline li.is-visible::before,
 html.js.reveal-all .timeline li::before { transform: scale(1); }
 
 .show-more { margin: 0.25rem 0 0 2rem; }
-
-// Talks
-.talks { display: grid; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
-
-.talk {
-  display: grid;
-  grid-template-columns: 6.2rem 1fr;
-  gap: 0.25rem 1rem;
-  align-items: start;
-  padding: 0.95rem 1.1rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  transition: transform 0.3s var(--ease), box-shadow 0.3s, border-color 0.3s;
-
-  &:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: rgba(var(--accent-rgb), 0.35); }
-
-  .date { padding-top: 0.2em; font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.03em; color: var(--accent); white-space: nowrap; }
-  .title { font-weight: 600; color: var(--text); }
-  .venue { font-size: 0.93rem; color: var(--text-2); }
-  .links { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
-}
 
 // Footer
 .site-footer {
@@ -825,7 +802,7 @@ html.js.reveal-all [data-reveal] { opacity: 1; transform: none; }
   .social { justify-content: center; }
   .section-head h2 { font-size: 1.4rem; }
   .lead { font-size: 1.04rem; }
-  .timeline li, .talk { grid-template-columns: 1fr; gap: 0.1rem; }
+  .timeline li { grid-template-columns: 1fr; gap: 0.1rem; }
   .show-more { margin-left: 2rem; }
   .to-top { right: 0.9rem; bottom: 0.9rem; width: 40px; height: 40px; }
 }
@@ -833,7 +810,7 @@ html.js.reveal-all [data-reveal] { opacity: 1; transform: none; }
 @media print {
   .bg-blobs, #bg-canvas, .topbar, .to-top, .show-more { display: none !important; }
   .wrapper { display: block; padding: 0; }
-  .profile, .interest, .talk { box-shadow: none; }
+  .profile, .interest { box-shadow: none; }
   html.js [data-reveal] { opacity: 1; transform: none; }
   html.js .section-head::after, html.js .timeline::before, html.js .timeline li::before { transform: none; }
 }

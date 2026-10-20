@@ -26,23 +26,6 @@ const news = [
   { date: 'Jun 2024', text: '"Multi-objective Differentiable Neural Architecture Search" was accepted to the WANT workshop at ICML 2024.' },
 ];
 
-const talks = [
-  {
-    date: 'Nov 2024',
-    title: 'Searching for Calibrated, Efficient, and Expressive Neural Networks',
-    venue: 'University of Basel',
-    links: [{ label: 'Slides', href: '/assets/files/Talk_basel.pdf', icon: 'fa-solid fa-file-powerpoint' }],
-  },
-  {
-    date: 'Mar 2024',
-    title: 'Multi-objective Differentiable Neural Architecture Search',
-    venue: 'AutoML Seminars',
-    links: [
-      { label: 'YouTube', href: 'https://www.youtube.com/watch?v=649r1j31RbU', icon: 'fa-brands fa-youtube' },
-      { label: 'Slides', href: '/assets/files/MODNAS.pdf', icon: 'fa-solid fa-file-powerpoint' },
-    ],
-  },
-];
 ---
 
 <BaseLayout>
@@ -81,27 +64,6 @@ const talks = [
     </ol>
   </section>
 
-  <section class="block" id="talks">
-    <SectionHead index="04" title="Recent Talks / Seminars" />
-    <ul class="talks">
-      {talks.map((talk, i) => (
-        <li class="talk" data-reveal data-tilt="3" style={`--i:${i}`}>
-          <span class="date">{talk.date}</span>
-          <div>
-            <div class="title">{talk.title}</div>
-            <div class="venue">{talk.venue}</div>
-            <div class="links">
-              {talk.links.map((link) => (
-                <a class="pill" href={link.href} target="_blank" rel="noopener">
-                  <i class={link.icon} aria-hidden="true"></i>{link.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </section>
 
   <Publications />
 </BaseLayout>
