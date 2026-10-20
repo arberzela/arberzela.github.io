@@ -76,7 +76,7 @@ $mono: SFMono-Regular, Consolas, Monaco, "Liberation Mono", Menlo, monospace;
   --bg-rgb: var(--p-bg-rgb);
 
   // Flat page: the hero carries the illustration, so the site background is hidden here.
-  .bg-blobs, #bg-canvas { display: none; }
+  #bg-canvas { display: none; }
 }
 :root[data-page="post"][data-theme="dark"] { @include post-dark; }
 @media (prefers-color-scheme: dark) {

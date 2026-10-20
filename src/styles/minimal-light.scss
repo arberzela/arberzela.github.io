@@ -27,17 +27,17 @@
   --accent-2: #7c3aed;
   --accent-2-rgb: 124, 58, 237;
   --accent-3: #0891b2;
+  --accent-3-rgb: 8, 145, 178;
   --shadow: 0 1px 2px rgba(23, 27, 38, 0.04), 0 12px 32px -12px rgba(23, 27, 38, 0.18);
   --shadow-hover: 0 2px 4px rgba(23, 27, 38, 0.05), 0 24px 48px -16px rgba(37, 99, 235, 0.3);
   --glow: rgba(37, 99, 235, 0.35);
   --code-bg: rgba(23, 27, 38, 0.05);
   --img-bg: #ffffff;
-  // background canvas + blobs
-  --line-alpha: 0.16;
-  --node-alpha: 0.55;
-  --blob-1: rgba(37, 99, 235, 0.16);
-  --blob-2: rgba(124, 58, 237, 0.13);
-  --blob-3: rgba(8, 145, 178, 0.13);
+  // Neural background (src/scripts/background.ts): opacities of dendrites, synapses, somata, activity
+  --neural-arbor: 0.2;
+  --neural-synapse: 0.3;
+  --neural-soma: 0.5;
+  --neural-glow: 0.45;
 }
 
 @mixin dark-tokens {
@@ -57,16 +57,16 @@
   --accent-2: #a78bfa;
   --accent-2-rgb: 167, 139, 250;
   --accent-3: #22d3ee;
+  --accent-3-rgb: 34, 211, 238;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -16px rgba(0, 0, 0, 0.6);
   --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -16px rgba(96, 165, 250, 0.25);
   --glow: rgba(96, 165, 250, 0.4);
   --code-bg: rgba(255, 255, 255, 0.06);
   --img-bg: #ffffff;
-  --line-alpha: 0.22;
-  --node-alpha: 0.75;
-  --blob-1: rgba(59, 130, 246, 0.22);
-  --blob-2: rgba(139, 92, 246, 0.2);
-  --blob-3: rgba(34, 211, 238, 0.15);
+  --neural-arbor: 0.26;
+  --neural-synapse: 0.36;
+  --neural-soma: 0.7;
+  --neural-glow: 0.8;
 }
 
 // Emit rules for dark mode: explicit toggle, or system preference when no explicit light choice.
@@ -112,7 +112,6 @@
   --glow: rgba(56, 189, 248, 0.35);
   --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -16px rgba(56, 189, 248, 0.22);
   --code-bg: #1e293b;
-  --blob-1: rgba(56, 189, 248, 0.14);
 }
 :root[data-section="blog"][data-theme="dark"] { @include blog-dark-tokens; }
 @media (prefers-color-scheme: dark) {
@@ -165,37 +164,7 @@ code, pre { font-family: var(--font-mono); font-size: 0.9em; }
 code { background: var(--code-bg); padding: 0.1em 0.4em; border-radius: 6px; }
 ::selection { background: rgba(var(--accent-rgb), 0.25); }
 
-// Soft colour fields drifting behind everything.
-.bg-blobs {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  overflow: hidden;
-  pointer-events: none;
-
-  span {
-    position: absolute;
-    width: 58vmax;
-    height: 58vmax;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, var(--blob-1), transparent 72%);
-    animation: blob-drift 28s ease-in-out infinite alternate;
-    will-change: transform;
-  }
-  span:nth-child(1) { top: -22vmax; left: -16vmax; }
-  span:nth-child(2) {
-    right: -14vmax; bottom: -26vmax;
-    background: radial-gradient(closest-side, var(--blob-2), transparent 72%);
-    animation-duration: 34s; animation-delay: -9s;
-  }
-  span:nth-child(3) {
-    top: 28vh; left: 38vw; width: 42vmax; height: 42vmax;
-    background: radial-gradient(closest-side, var(--blob-3), transparent 72%);
-    animation-duration: 40s; animation-delay: -18s;
-  }
-}
-
-// Constellation canvas (drawn by src/scripts/background.ts).
+// Neural-tissue canvas (drawn by src/scripts/background.ts, simulated in src/scripts/neural/tissue.ts).
 #bg-canvas {
   position: fixed;
   inset: 0;
@@ -750,10 +719,6 @@ html.js.reveal-all .timeline li::before { transform: scale(1); }
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
-@keyframes blob-drift {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to { transform: translate3d(6vw, 5vh, 0) scale(1.12); }
-}
 
 // Scroll reveal: only when JS is running, and only until the element is in view.
 html.js [data-reveal] {
@@ -831,7 +796,7 @@ html.js.reveal-all [data-reveal] { opacity: 1; transform: none; }
 }
 
 @media print {
-  .bg-blobs, #bg-canvas, .topbar, .to-top, .show-more { display: none !important; }
+  #bg-canvas, .topbar, .to-top, .show-more { display: none !important; }
   .wrapper { display: block; padding: 0; }
   .profile, .interest, .talk { box-shadow: none; }
   html.js [data-reveal] { opacity: 1; transform: none; }
