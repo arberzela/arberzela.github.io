@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SfprmHero from '../../components/heroes/SfprmHero.astro';
+import PbtNcaHero from '../../components/heroes/PbtNcaHero.astro';
 import CoverHero from '../../components/heroes/CoverHero.astro';
 import { siteConfig } from '../../config';
 import { getPosts, getPostBody, preparePost, tocHtml, readingTime, formatDate } from '../../utils/posts';
@@ -43,7 +44,9 @@ const jsonLd = {
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
 
-  {post.hero === 'sfprm-sphere' ? <SfprmHero paper={post.paper} code={post.code} /> : <CoverHero post={post} />}
+  {post.hero === 'sfprm-sphere' ? <SfprmHero paper={post.paper} code={post.code} />
+    : post.hero === 'pbtnca-worlds' ? <PbtNcaHero paper={post.paper} code={post.code} />
+    : <CoverHero post={post} />}
 
   <div class="article-layout">
     <article class="post" data-post>
@@ -93,6 +96,11 @@ const jsonLd = {
       </aside>
     )}
   </div>
+
+  <script>
+    // Interactive figures inside post bodies; each mounts only where its element appears.
+    import '../../scripts/widgets/cell-duel';
+  </script>
 
   {toc.length > 0 && (
     <button type="button" class="btn-toc-toggle" data-toc-toggle aria-controls="toc-sidebar" aria-expanded="false" aria-label="Table of contents">

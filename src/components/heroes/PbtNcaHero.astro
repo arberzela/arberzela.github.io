@@ -1,0 +1,79 @@
+---
+// Full-width hero for the PBT-NCA post: the highest-scoring world of one PBT-NCA run at eight
+// meta-iterations, laid out as a strip of worlds, with a glass control card (scene title, the run's
+// mean composite score with the scenes marked on it, pause, replay, speed).
+import { WORLD_SCENES, AGENT_COLORS, MEDIA, sceneTitle } from '../../scripts/heroes/pbtnca-scenes';
+
+interface Props {
+  paper?: string;
+  code?: string;
+}
+const { paper, code } = Astro.props;
+const first = WORLD_SCENES[0];
+---
+
+<section class="post-hero worlds-hero" data-worlds-hero aria-label="The best world of a PBT-NCA run at eight meta-iterations">
+  <div class="worlds-glow" data-worlds-glow aria-hidden="true">
+    <img src={`${MEDIA}/${first.slug}-glow.png`} alt="" width="128" height="128" />
+  </div>
+
+  <div class="worlds-strip" data-worlds-strip aria-hidden="true">
+    {WORLD_SCENES.map((s, i) => (
+      <div class:list={['world', { 'is-active': i === 0 }]} data-world={i} style={`--o: ${i}`}>
+        <img class="world-poster" src={`${MEDIA}/${s.slug}.png`} alt="" width="512" height="512" decoding="async" />
+        <span class="world-tag">meta-iter {s.iter}</span>
+      </div>
+    ))}
+  </div>
+
+  <div class="hero-legend" aria-hidden="true">
+    <span class="legend-item">
+      <span class="legend-swatches">{AGENT_COLORS.map((c) => <span class="legend-dot" style={`--c: ${c}`}></span>)}</span>
+      7 agents
+    </span>
+    <span class="legend-item"><span class="legend-dot is-env"></span>Environment</span>
+  </div>
+
+  {code && (
+    <a class="hero-github-badge" href={code} target="_blank" rel="noopener" title="View the code on GitHub">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+      </svg>
+      <span>GitHub</span>
+    </a>
+  )}
+
+  <div class="chart-tip" data-chart-tip hidden>
+    <b data-tip-value></b><span data-tip-label></span>
+  </div>
+
+  <p class="hero-hint" aria-hidden="true">Real rollouts · best of 30 worlds at each meta-iteration</p>
+
+  <div class="hero-overlay">
+    <div class="hero-nav">
+      <button type="button" class="nav-btn" data-hero-prev aria-label="Previous world">&larr;</button>
+      <div class="hero-info">
+        <p class="hero-title" data-hero-title>{sceneTitle(first)}</p>
+        <p class="hero-desc" data-hero-desc>{first.desc}</p>
+        <canvas class="hero-chart" data-hero-chart aria-hidden="true"></canvas>
+        <p class="hero-status" data-hero-status aria-live="off"></p>
+      </div>
+      <div class="nav-next-wrapper">
+        <button type="button" class="nav-btn" data-hero-next aria-label="Next world">&rarr;</button>
+        <div class="hero-counter" data-hero-counter>1 / {WORLD_SCENES.length}</div>
+      </div>
+    </div>
+    <div class="hero-controls">
+      <button type="button" class="control-btn" data-hero-play>Pause</button>
+      <button type="button" class="control-btn" data-hero-replay>Replay</button>
+      <button type="button" class="control-btn" data-hero-speed>Speed 1×</button>
+      {paper
+        ? <a class="control-btn explore-cta-btn" href={paper} target="_blank" rel="noopener">Paper ➜</a>
+        : <a class="control-btn explore-cta-btn" href="#method">Method ↓</a>}
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/heroes/pbtnca-hero';
+</script>

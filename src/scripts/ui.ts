@@ -369,8 +369,9 @@ function setupVideos() {
     (entries) => {
       for (const entry of entries) {
         const v = entry.target as HTMLVideoElement;
-        if (entry.isIntersecting) v.play().catch(() => { /* autoplay blocked: the controls remain */ });
-        else v.pause();
+        if (!entry.isIntersecting) v.pause();
+        // With reduced motion, clips that do not autoplay by themselves wait for the reader.
+        else if (!(reduceMotion.matches && !v.autoplay)) v.play().catch(() => { /* autoplay blocked: the controls remain */ });
       }
     },
     { threshold: 0.15 },

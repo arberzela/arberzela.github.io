@@ -12,10 +12,22 @@ export interface Post {
     paper?: string;
     code?: string;
     /** Custom interactive hero; posts without one show their cover figure on the dark grid. */
-    hero?: "sfprm-sphere";
+    hero?: "sfprm-sphere" | "pbtnca-worlds";
 }
 
 export const posts: Post[] = [
+    {
+        slug: "pbt-nca",
+        title: "Evolving Many Worlds",
+        subtitle: "Open-ended discovery in Petri Dish NCA via population-based training",
+        date: "2026-10-21",
+        summary: "Evolve a population of learning Petri dishes under a moving target: be unlike the past, be unlike the rest of the population. Gliders, amoebas, colonies and spiral waves keep appearing for 500 meta-iterations.",
+        cover: "/blog/pbt-nca/media/cover.png",
+        tags: ["artificial life", "open-endedness", "paper"],
+        paper: "https://arxiv.org/abs/2604.11248",
+        code: "https://github.com/arberzela/pbt-nca",
+        hero: "pbtnca-worlds"
+    },
     {
         slug: "sfprm",
         title: "Spherical Fixed-Point Reasoners",

@@ -33,6 +33,11 @@ $mono: SFMono-Regular, Consolas, Monaco, "Liberation Mono", Menlo, monospace;
   --p-c-prop: #0284c7;
   --p-c-state: #7c3aed;
   --p-c-halt: #059669;
+  // Agents of the PD-NCA renderings (red, green, blue), stepped to pass the colour checks per mode.
+  --p-agent-1: #d91820;
+  --p-agent-2: #55a651;
+  --p-agent-3: #2e2be8;
+  --p-env: #64748b;
 }
 
 @mixin post-dark {
@@ -59,6 +64,10 @@ $mono: SFMono-Regular, Consolas, Monaco, "Liberation Mono", Menlo, monospace;
   --p-c-prop: #38bdf8;
   --p-c-state: #a78bfa;
   --p-c-halt: #34d399;
+  --p-agent-1: #d33b36;
+  --p-agent-2: #15b418;
+  --p-agent-3: #384ae8;
+  --p-env: #94a3b8;
 }
 
 :root[data-page="post"] {
@@ -390,6 +399,113 @@ $mono: SFMono-Regular, Consolas, Monaco, "Liberation Mono", Menlo, monospace;
     > b:first-child::before { counter-increment: figure; content: "Figure " counter(figure) ": "; }
   }
 
+  // Grids of rollout clips and of single frames (PD-NCA worlds are square).
+  .rollouts, .frames {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px 12px;
+    &.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .rollout, .frame { margin: 0; min-width: 0; }
+  .rollout video, .frame img { aspect-ratio: 1; object-fit: cover; background: #000; }
+  .rollout-label, .frame span {
+    display: block;
+    margin-top: 6px;
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: var(--p-muted);
+    b { font-weight: 600; color: var(--p-strong); }
+  }
+
+  // "One contested cell" (src/scripts/widgets/cell-duel.ts).
+  .cell-duel {
+    padding: 16px 18px;
+    border: 1px solid var(--p-border);
+    border-radius: 8px;
+    background: var(--p-surface-2);
+  }
+  .duel-fallback { margin: 0; font-size: 14px; color: var(--p-muted); }
+  .duel { display: grid; grid-template-columns: minmax(180px, 220px) minmax(0, 1fr); gap: 22px; align-items: center; }
+  .duel-svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .duel-ring { fill: none; stroke: var(--p-border); stroke-width: 1; }
+  .duel-ring-label { font: 700 9.5px $sys; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--p-faint); }
+  .duel-hub { fill: var(--p-muted); }
+  .e-env { --c: var(--p-env); }
+  .e-a1 { --c: var(--p-agent-1); }
+  .e-a2 { --c: var(--p-agent-2); }
+  .e-a3 { --c: var(--p-agent-3); }
+  .duel-shaft { stroke: var(--c); stroke-width: 2; stroke-linecap: round; }
+  .duel-head { stroke-linejoin: round; }
+  .duel-head.is-attack { fill: var(--c); stroke: var(--c); stroke-width: 1; }
+  .duel-head.is-defense { fill: var(--p-bg); stroke: var(--c); stroke-width: 2; }
+  .duel-handle {
+    fill: transparent;
+    stroke: var(--c);
+    stroke-opacity: 0.28;
+    stroke-width: 1.5;
+    cursor: grab;
+    touch-action: none;
+    outline: none;
+    transition: stroke-opacity 0.15s ease, fill 0.15s ease;
+    &:hover, &:focus-visible, &.is-dragging { stroke-opacity: 0.95; fill: color-mix(in srgb, var(--c) 16%, transparent); }
+    &:focus-visible { stroke-width: 2.5; }
+    &.is-dragging { cursor: grabbing; }
+  }
+  .duel-actions { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+
+  .duel-table { display: grid; gap: 8px; }
+  .duel-row {
+    display: grid;
+    grid-template-columns: 94px minmax(0, 1fr) minmax(0, 1fr) 48px;
+    gap: 10px;
+    align-items: center;
+    font-size: 13px;
+    &.is-head .duel-tick { font: 700 10.5px $sys; letter-spacing: 0.05em; text-transform: uppercase; color: var(--p-faint); transform: none; }
+    &.is-axis { margin-top: -2px; }
+  }
+  .duel-name { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 600; color: var(--p-strong); white-space: nowrap; }
+  .duel-swatch { flex-shrink: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+  .e-env .duel-swatch { background: transparent; box-shadow: inset 0 0 0 2px var(--c); }
+  .duel-psi, .duel-w { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .duel-track {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 10px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--p-faint) 16%, transparent);
+    &.is-diverging::before { content: ""; position: absolute; top: -3px; bottom: -3px; left: 50%; width: 1px; background: var(--p-faint); }
+    &.is-scale { height: 14px; background: none; }
+  }
+  .duel-bar { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 3px; background: var(--c); }
+  .duel-alpha { position: absolute; top: -3px; bottom: -3px; left: 40%; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--p-heading); opacity: 0.75; }
+  .duel-tick {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    font: 600 10px/14px $mono;
+    white-space: nowrap;
+    color: var(--p-faint);
+    &:first-child { transform: none; }
+    &:last-child:not(:first-child) { transform: translateX(-100%); }
+  }
+  .duel-val { flex-shrink: 0; width: 44px; text-align: right; font: 600 12px $mono; font-variant-numeric: tabular-nums; color: var(--p-strong); }
+  .duel-status {
+    font-size: 12.5px;
+    white-space: nowrap;
+    color: var(--p-muted);
+    &.is-alive { font-weight: 600; color: var(--p-strong); }
+    &.is-dead { color: var(--p-faint); }
+  }
+  .duel-breakdown {
+    margin: 14px 0 0;
+    font: 12px/1.6 $mono;
+    color: var(--p-muted);
+    .duel-bd-num { font-weight: 600; color: var(--p-strong); }
+    .is-total { color: var(--p-heading); }
+  }
+  .duel-summary { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--p-text); }
+
   .post-footer {
     margin: 3em 0 0;
     padding-top: 16px;
@@ -539,5 +655,26 @@ $mono: SFMono-Regular, Consolas, Monaco, "Liberation Mono", Menlo, monospace;
     .hero .dek { font-size: 1.05rem; }
     .numbers { grid-template-columns: repeat(2, 1fr); }
     .author-card { grid-template-columns: 1fr; justify-items: start; }
+    .rollouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+}
+
+// The contested cell stacks below 700px: dial on top, and each entity on two lines (name and fate,
+// then its two bars).
+@media (max-width: 700px) {
+  .post {
+    .duel { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .duel-dial { width: 100%; max-width: 260px; margin: 0 auto; }
+    .duel-row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-areas: "name status" "psi w";
+      gap: 4px 12px;
+      .duel-name { grid-area: name; }
+      .duel-status { grid-area: status; text-align: right; }
+      .duel-psi { grid-area: psi; }
+      .duel-w { grid-area: w; }
+      &.is-head, &.is-axis { grid-template-areas: "psi w"; .duel-name, .duel-status { display: none; } }
+    }
+    .duel-table { gap: 10px; }
   }
 }

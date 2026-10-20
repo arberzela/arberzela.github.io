@@ -282,6 +282,126 @@ $accent: #38bdf8;
   }
 }
 
+// PBT-NCA hero: a strip of worlds. The script sets each world's transform from its distance to the
+// active one (--world-size and --world-cy from the space above the card); without it only the first
+// world shows.
+.worlds-hero {
+  --world-size: min(40vh, 340px);
+  --world-cy: 36%;
+  $radius: 14px;
+
+  .worlds-strip {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    touch-action: pan-y;
+  }
+  .world {
+    position: absolute;
+    top: var(--world-cy);
+    left: 50%;
+    width: var(--world-size);
+    height: var(--world-size);
+    border-radius: $radius;
+    background: #000;
+    box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(148, 163, 184, 0.14);
+    transform: translate(-50%, -50%);
+    transform-origin: center;
+    transition: transform 0.75s cubic-bezier(0.22, 0.8, 0.22, 1), opacity 0.6s ease, box-shadow 0.4s ease;
+    cursor: pointer;
+    will-change: transform;
+    // Glass rim with a soft highlight, above the poster and the clip.
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      border-radius: $radius;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), transparent 38%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      pointer-events: none;
+    }
+    &.is-active {
+      cursor: default;
+      box-shadow: 0 34px 70px -28px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba($accent, 0.38);
+    }
+  }
+  .world-poster,
+  .world-video {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: $radius;
+    object-fit: cover;
+  }
+  .world-video { opacity: 0; transition: opacity 0.35s ease; }
+  .world.has-video .world-video { opacity: 1; }
+  .world-tag {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-top: calc(10px / var(--s, 1));
+    transform: translateX(-50%);
+    font: 600 calc(10.5px / var(--s, 1)) / 1 $mono;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: rgba(148, 163, 184, 0.85);
+    transition: opacity 0.4s ease;
+  }
+  .world.is-active .world-tag { opacity: 0; }
+  &:not(.is-live) .world:not(.is-active) { display: none; }
+
+  // The active world's colours as an ambient glow behind the strip. The glow images are blurred and
+  // faded at build time (media/*-glow.png): a live CSS blur is costly and WebKit drops it while the
+  // crossfade runs.
+  .worlds-glow {
+    position: absolute;
+    top: var(--world-cy);
+    left: 50%;
+    width: calc(var(--world-size) * 2.2);
+    height: calc(var(--world-size) * 2.2);
+    transform: translate(-50%, -50%);
+    opacity: 0.62;
+    pointer-events: none;
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.9s ease;
+      &.is-entering, &.is-leaving { opacity: 0; }
+    }
+  }
+
+  .legend-swatches { display: inline-flex; gap: 3px; }
+  .legend-dot.is-env { background: #000; box-shadow: 0 0 0 1.5px rgba(226, 232, 240, 0.6); }
+  .hero-chart { cursor: crosshair; }
+}
+
+.chart-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 12;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(51, 65, 85, 0.7);
+  border-radius: 6px;
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.8);
+  font-size: 10.5px;
+  color: #94a3b8;
+  white-space: nowrap;
+  pointer-events: none;
+  will-change: transform;
+  b { font: 600 12px/1.2 $mono; color: #f8fafc; font-variant-numeric: tabular-nums; }
+  &[hidden] { display: none; }
+}
+
 @media (max-width: 768px) {
   .post-hero { height: 72vh; min-height: 520px; }
   .hero-legend { top: 10px; left: 10px; max-width: calc(100% - 104px); gap: 4px 10px; padding: 5px 9px; font-size: 10px; }
@@ -296,8 +416,11 @@ $accent: #38bdf8;
   .control-btn { width: 100%; height: 28px; font-size: 9px; padding: 0 6px; }
   .control-select { font-size: 10px; padding-right: 16px; }
   .hero-tooltip { display: none; }
+  .worlds-hero .hero-controls { grid-template-columns: repeat(4, 1fr); }
+  .worlds-hero .world-tag { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   [data-hero-play], [data-hero-speed] { display: none; }
+  .worlds-hero .world, .worlds-hero .worlds-glow img { transition: none; }
 }

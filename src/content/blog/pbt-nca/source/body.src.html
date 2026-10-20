@@ -1,0 +1,247 @@
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">Paper · artificial life · open-endedness</div>
+    <h1>Evolving Many Worlds</h1>
+    <p class="dek">Petri Dish NCA are learning ecosystems that rarely stay interesting: they freeze, dissolve into noise, or are taken over by a single species. Evolve thirty of them at once under a target that keeps moving, be unlike the past and unlike each other, and new forms of artificial life keep appearing for 500 generations.</p>
+    <div class="byline">
+      <span><b>Uljad Berdica</b>*, <b>Jakob Foerster</b>, <b>Frank Hutter</b>, <b>Arber Zela</b>* (*equal contribution)</span>
+      <span>University of Oxford (FLAIR) · ELLIS Institute Tübingen · University of Freiburg · Prior Labs · EPFL</span>
+      <span>ALIFE 2026 (Oral)</span>
+    </div>
+    <div class="links">
+      <a href="https://arxiv.org/abs/2604.11248" target="_blank" rel="noopener">Paper (arXiv)</a>
+      <a href="https://github.com/arberzela/pbt-nca" target="_blank" rel="noopener">Code</a>
+      <a href="https://pbt-nca.github.io/" target="_blank" rel="noopener">Project page</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#cite">Cite</a>
+    </div>
+  </div>
+</div>
+
+<div class="post-body">
+<div class="wrap">
+
+<div class="tldr">
+  <div class="t">TL;DR</div>
+  <ol>
+    <li>Petri Dish NCA (PD-NCA) put several neural cellular automata on one grid, where they compete for cells and keep learning by gradient descent while they do. The dynamics can be rich, but large regions of their hyperparameter space end in frozen equilibria, structureless noise or a monoculture.</li>
+    <li>PBT-NCA evolves a population of 30 such worlds with population-based training under a non-stationary objective. A world scores by how different its rollout is from an archive of past behaviors and, through a frozen DINOv2 encoder, from the other worlds of the current population.</li>
+    <li>Every five meta-iterations the lowest-scoring quarter is replaced by Lamarckian copies of elite worlds, which inherit weights, optimizer state and the grid itself before their hyperparameters are crossed over and mutated and their weights perturbed.</li>
+    <li>Over 500 meta-iterations the population keeps producing new regimes: shooters, gliders, spiral waves, amoebas, colonies that eject spores, ant-like trails and circuit-like spaceships. Two metrics place it at the edge of chaos: ecological persistence near 1.0 and effective complexity of 0.21 ± 0.05.</li>
+  </ol>
+</div>
+
+<h2 id="substrate">A Petri dish that learns</h2>
+
+<p class="lede">Cellular automata are the classic model of complexity from local rules: each cell updates from its neighborhood, and gliders, guns and self-replicators appear in systems as simple as the Game of Life. <a href="https://distill.pub/2020/growing-ca/" target="_blank" rel="noopener">Neural cellular automata</a> learn the update rule instead of writing it down, training a small network to grow, maintain and regenerate a target pattern. <a href="https://pub.sakana.ai/pdnca/" target="_blank" rel="noopener">Petri Dish NCA</a> turn this into an ecology. Several NCAs, the agents, share one grid, which we call a world. They compete for its cells, and they never stop learning.</p>
+
+<p>Each cell of a world holds a feature vector \(\mathbf{x} = [\mathbf{a}; \mathbf{d}; \mathbf{h}]\) of attack channels, defense channels and hidden channels, together with an aliveness value per agent that records which agents occupy it. At every step, each agent alive near a cell looks at the cell's 3×3 neighborhood, and its network \(f_{\theta_k}\) proposes an update \(\Delta\mathbf{x}^k\). A background environment, entity \(k = 0\), proposes a random, static update of its own: a harsh climate that every agent has to keep defending against just to survive.</p>
+
+<p>Who gets the cell is decided by cosine similarities between the proposals. Agent \(k\) gains on agent \(l\) when its attack points along \(l\)'s defense, and loses when \(l\)'s attack points along its own:</p>
+
+\[\phi_{kl} = \cos(\mathbf{a}^k, \mathbf{d}^l) - \cos(\mathbf{a}^l, \mathbf{d}^k), \qquad \Psi_k = \sum_{l \neq k} \phi_{kl},\]
+
+<p>where the sum runs over every other agent present and the environment. The strengths become shares \(w^k = \mathrm{softmax}(\Psi)_k\), so the competition is not winner-takes-all: the cell moves to a share-weighted blend of every proposal,</p>
+
+\[\mathbf{x}^{t+1} = \mathrm{clip}\left[\mathbf{x}^t + \sum_{k=0}^{N} w^k\,\Delta\mathbf{x}^k\right].\]
+
+<p>The shares also decide survival. Agent \(k\) stays alive in the cell while \(w^k > \alpha = 0.4\); below that it dies there, and its influence is redistributed. Three shares cannot all exceed 0.4, so at most two agents coexist in a cell, which keeps territorial borders fluid.</p>
+
+<figure class="duel-figure">
+  <div class="cell-duel" data-cell-duel>
+    <p class="duel-fallback">This figure is interactive and needs JavaScript.</p>
+  </div>
+  <figcaption><b>One contested cell.</b> The competition rule above, evaluated live for three agents and the environment. Each entity proposes an attack direction (solid arrow) and a defense direction (hollow arrow); two attack and two defense channels make them directions in the plane, as in the released configuration. Drag an arrowhead, or focus it and use the arrow keys, to watch the strengths \(\Psi\) and the shares \(w\) respond; an entity survives in the cell only while its share stays above \(\alpha = 0.4\).</figcaption>
+</figure>
+
+<p>The second level is learning. Every \(\tau\) rollout steps, each agent takes a gradient step that maximizes its log-aliveness over the whole grid,</p>
+
+\[\mathcal{L}_k = -\log \sum_{u,v} A^{t+\tau,k}_{u,v}.\]
+
+<p>That is the entire objective: grow. Nothing asks for structure, cooperation or movement.</p>
+
+<h2 id="problem">Left alone, most dishes stall</h2>
+
+<p>This simple drive is also the problem. In a single world, once one interaction pattern dominates, gradient descent tends to reinforce it. The high-dimensional space of PD-NCA settings is full of regions where the dynamics freeze into static equilibria, dissolve into high-entropy noise, or collapse into a monoculture in which one agent occupies every cell. Two baselines from the paper show what this looks like with three agents.</p>
+
+<figure>
+  <div class="frames">
+    <div class="frame"><img src="/blog/pbt-nca/media/pdnca-iter100.png" alt="PD-NCA with fixed hyperparameters at iteration 100: high-entropy noise" width="512" height="512"><span>PD-NCA · iter 100</span></div>
+    <div class="frame"><img src="/blog/pbt-nca/media/pdnca-iter50000.png" alt="PD-NCA with fixed hyperparameters at iteration 50,000: high-entropy noise" width="512" height="512"><span>iter 50,000</span></div>
+    <div class="frame"><img src="/blog/pbt-nca/media/pdnca-iter100000.png" alt="PD-NCA with fixed hyperparameters at iteration 100,000: high-entropy noise" width="512" height="512"><span>iter 100,000</span></div>
+    <div class="frame"><img src="/blog/pbt-nca/media/rs-iter145.png" alt="Random search at meta-iteration 145: blobs of three agents" width="512" height="512"><span>Random search · meta-iter 145</span></div>
+    <div class="frame"><img src="/blog/pbt-nca/media/rs-iter485.png" alt="Random search at meta-iteration 485: nested square spirals" width="512" height="512"><span>meta-iter 485</span></div>
+    <div class="frame"><img src="/blog/pbt-nca/media/rs-iter495.png" alt="Random search at meta-iteration 495: a maze of nested spirals" width="512" height="512"><span>meta-iter 495</span></div>
+  </div>
+  <figcaption><b>Two baselines, three agents each.</b> Top: PD-NCA with the original fixed hyperparameters at iterations 100, 50,000 and 100,000, high-entropy noise throughout. Bottom: random search, which samples hyperparameters uniformly from the PBT-NCA search space with the same population size and compute, finds some regular, cyclic patterns. Colors are agents; black is the environment.</figcaption>
+</figure>
+
+<h2 id="method">Evolving many worlds</h2>
+
+<p>PBT-NCA wraps PD-NCA in <a href="https://arxiv.org/abs/1711.09846" target="_blank" rel="noopener">population-based training</a> (PBT), but makes selection explicitly non-stationary. The goal is not to converge to one optimum. It is to keep a population of worlds that stay behaviorally novel, visually distinct and dynamically alive. Earlier work such as <a href="https://arxiv.org/abs/2412.17799" target="_blank" rel="noopener">ASAL</a> used foundation models to search over frozen world configurations; here the selection pressure acts on worlds whose agents interact with each other and keep adapting their update rules.</p>
+
+<p>A world is the full state of an ongoing ecosystem: the parameters of all its agents, their optimizer states, the grid with its counters, and the hyperparameters of its learning, namely the learning rate, the batch size and the number of steps per update. One meta-iteration does the following.</p>
+
+<ol class="steps">
+  <li><b class="o">ROLL OUT</b> &nbsp; Every world runs for \(T_{\mathrm{world}} = 12\) inner steps with cell updates and gradient steps interleaved, so its agents keep adapting while it is evaluated. The whole trajectory is scored, not only its last frame: worlds that end alike can differ in how long their agents coexisted, competed or collapsed.</li>
+  <li><b class="bl">SCORE</b> &nbsp; Each world gets \(\mathcal{F}_i = \mathcal{N}_i + \mathcal{D}_i\), the sum of its novelty with respect to the past and its visual diversity with respect to the present population, both defined below.</li>
+  <li><b class="pu">ARCHIVE</b> &nbsp; The behavior descriptors of the two top-scoring worlds are appended to a first-in, first-out archive; once it is full, the oldest entries are dropped.</li>
+  <li><b class="g">EXPLOIT AND EXPLORE</b> &nbsp; Every \(K = 5\) meta-iterations, the lowest-scoring quarter of the population is replaced by mutated copies of elite worlds.</li>
+</ol>
+
+<figure>
+  <img src="/blog/pbt-nca/media/fig-overview.png" alt="Diagram of one PBT-NCA meta-iteration: rollout and score, archive update, exploit-explore with copy, crossover, mutate and perturb" width="1005" height="886">
+  <figcaption><b>One meta-iteration.</b> Each square is a PD-NCA world: weights, optimizer, grid and hyperparameters. All worlds are rolled out and scored (1), the descriptors of the top worlds enter the FIFO archive (2), and the lowest-scoring worlds are replaced by mutated copies of elite parents (3).</figcaption>
+</figure>
+
+<h3>Novelty against the past</h3>
+
+<p>Comparing raw grids would be brittle, so each rollout is summarized with statistics borrowed from ecology. At every inner step we compute the fraction of the total alive mass held by each entity, the \(N\) agents and the environment. From these time series we take each entity's mean occupancy \(\mu\), its variability over time \(\sigma\) and its frame-to-frame turnover \(\delta\), plus two scalars: the entropy of the winner map, which measures how mixed or monopolized the world is, and the mean change of the alive mass \(\nu\). Concatenated and \(\ell_2\)-normalized, they form a descriptor \(\mathbf{d}_i \in \mathbb{R}^{3(N+1)+2}\) that keeps collapse, oscillation, dominance, and stable or volatile coexistence apart. A world's novelty is its mean distance to the \(k = 8\) nearest descriptors in the archive,</p>
+
+\[\mathcal{N}_i = \dfrac{1}{k} \sum_{j \in \mathrm{kNN}(i)} \|\mathbf{d}_i - \mathbf{d}_j\|_2 .\]
+
+<figure>
+  <img src="/blog/pbt-nca/media/fig-descriptor.png" alt="Diagram of the behavior descriptor: species fractions over time, mean, standard deviation and turnover per entity, winner entropy and alive-mass change, and kNN novelty against the archive" width="1910" height="457">
+  <figcaption><b>The behavior descriptor.</b> The alive mass of each entity, summed over space and normalized per step, gives species-fraction time series. Their statistics form the descriptor, which is scored by its mean distance to its nearest neighbors in the archive.</figcaption>
+</figure>
+
+<h3>Diversity against the present</h3>
+
+<p>The descriptor knows nothing about shape, texture or color. To capture those, every frame of every rollout is embedded with a frozen <a href="https://arxiv.org/abs/2304.07193" target="_blank" rel="noopener">DINOv2</a> encoder, and each world is compared with the other worlds of the population at the same time step. To be robust to outliers, a world's diversity at a frame is its median cosine distance to the others, and the score averages this over the rollout:</p>
+
+\[\mathcal{D}_i = \dfrac{1}{T} \sum_{t=1}^{T} \mathrm{median}_{j \neq i} \left( 1 - \langle \mathbf{z}^t_i, \mathbf{z}^t_j \rangle \right).\]
+
+<p>A world scores high on \(\mathcal{D}_i\) when it shows structures the rest of the population is not producing right now, even if its ecological statistics look ordinary.</p>
+
+<figure>
+  <img src="/blog/pbt-nca/media/fig-diversity.png" alt="Diagram of the visual diversity score: DINOv2 embeddings of frames at the same time step, pairwise cosine distances and row medians" width="1025" height="437">
+  <figcaption><b>Visual diversity.</b> At each time step the frames of all worlds are embedded with DINOv2; a world's score is its median cosine distance to the other worlds, averaged over the rollout.</figcaption>
+</figure>
+
+<p>The two terms pull in different directions on purpose. \(\mathcal{N}_i\) rewards a world for being unlike everything the run has archived, \(\mathcal{D}_i\) for being unlike its contemporaries. Both references move with every meta-iteration, so a world cannot settle into a trick that scored well once.</p>
+
+<h3>Exploit, then explore</h3>
+
+<p>Every five meta-iterations the population is ranked by \(\mathcal{F}\), and the bottom \(\rho = 25\%\), eight of the 30 worlds, are discarded. Each is replaced by a child of a parent drawn uniformly from the elite, made in four stages, the first three adapted from PBT:</p>
+
+<ul>
+  <li><b>Copy.</b> The parent world is deep-copied into the child: weights, optimizer state, grid and hyperparameters. Inheritance is Lamarckian, so descendants do not restart from a random initialization but continue a partly developed ecology.</li>
+  <li><b>Crossover.</b> Each hyperparameter keeps the parent's value with probability 0.5 and otherwise reverts to the child's previous value.</li>
+  <li><b>Mutation.</b> With probability 0.1, each hyperparameter is multiplied by 1.2 or 0.8 and clipped to its range.</li>
+  <li><b>Weight perturbation.</b> Gaussian noise is added to all network weights, a local variation that leaves the inherited world intact.</li>
+</ul>
+
+<p>The method therefore runs on two time scales. Within a rollout, gradient descent shapes what each world's agents do. Across meta-iterations, selection decides which ecological regimes survive, diversify and keep developing. All experiments use \(P = 30\) worlds, 500 meta-iterations, \(T_{\mathrm{world}} = 12\), \(K = 5\) and \(\rho = 0.25\), with Adam for the agents' weights and three agents per world unless stated otherwise.</p>
+
+<h2 id="gallery">What evolved</h2>
+
+<p>None of what follows was asked for. There is no objective for movement, cooperation or structure; everything below is a by-product of competing for territory under a pressure to be new. Every clip is a real rollout from the paper's runs. Colors are agents, and black is the environment.</p>
+
+<figure>
+  <div class="rollouts cols-2">
+    <div class="rollout"><video src="/blog/pbt-nca/media/shooters.mp4" poster="/blog/pbt-nca/media/shooters.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Shooters</b> · meta-iter 20</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/archipelago.mp4" poster="/blog/pbt-nca/media/archipelago.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Archipelago</b> · meta-iter 125</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/ants.mp4" poster="/blog/pbt-nca/media/ants.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Ant locomotion</b> · meta-iter 370</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/colony.mp4" poster="/blog/pbt-nca/media/colony.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Self-replication</b></span></div>
+  </div>
+  <figcaption><b>Worlds with three agents.</b> Shooters: stable territorial clusters emit projectile-like structures, like the glider guns of classical cellular automata. Archipelago: small, persistent islands hold their territory in open water. Ant locomotion: a trail of red cells works its way along the border of a blue territory, coordinated without any central control. Self-replication: a large red entity ejects small clusters of cells that colonize distant parts of the substrate.</figcaption>
+</figure>
+
+<figure>
+  <div class="rollouts">
+    <div class="rollout"><video src="/blog/pbt-nca/media/run7-iter020.mp4" poster="/blog/pbt-nca/media/run7-iter020.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Noise</b> · meta-iter 20</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/run7-iter145.mp4" poster="/blog/pbt-nca/media/run7-iter145.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Spiral waves</b> · meta-iter 145</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/run7-iter230.mp4" poster="/blog/pbt-nca/media/run7-iter230.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Amoeba</b> · meta-iter 230</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/run7-iter310.mp4" poster="/blog/pbt-nca/media/run7-iter310.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Pirate world</b> · meta-iter 310</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/run7-iter395.mp4" poster="/blog/pbt-nca/media/run7-iter395.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Alien</b> · meta-iter 395</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/run7-iter460.mp4" poster="/blog/pbt-nca/media/run7-iter460.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Glider</b> · meta-iter 460</span></div>
+  </div>
+  <figcaption><b>One run with seven agents, from noise to gliders.</b> The highest-scoring world of the population at six meta-iterations. Early on it is high-entropy noise. Then come traveling spiral waves and amoebas, fluid, shape-shifting macro-structures that migrate across the dish with coordinated, differentiated cell behavior. Later, a "pirate world" combines an archipelago with shooters; in the "alien" world the environment reclaims almost everything except a thin violet outline near the edge; and a small red glider crosses the dish diagonally.</figcaption>
+</figure>
+
+<p>The resemblances to natural and artificial life are hard to miss. Guns and gliders are the canonical mobile structures of discrete and continuous cellular automata, from the Game of Life to <a href="https://arxiv.org/abs/1812.05433" target="_blank" rel="noopener">Lenia</a>. The traveling spiral waves resemble the rotating spirals of cyclic competition in mobile populations, and their nested territories echo the hypercycles of prebiotic chemistry. The split into stable macro-structures and volatile frontiers mirrors the genetic drift at the expanding edges of microbial populations, the ejected clusters that colonize new ground mirror the spatial migration of microbes, and the amoebas are reminiscent of motility-induced phase separation. Stable regular domains with complex, interacting boundaries are, as Crutchfield and Mitchell argued, a prerequisite for emergent computation. That PBT-NCA finds them without the pattern-specific losses earlier work needed is a promising sign that it could also discover computational primitives.</p>
+
+<h3>A wider search space, a different kind of life</h3>
+
+<p>Two more hyperparameters change the character of what evolves: the temperature of the competition's softmax, and the fraction of hidden channels each agent may update. Given this extended search space, PBT-NCA abandons the fluid, organic morphologies in favor of rigid, circuit-like geometric expansions, with spaceships, gliders and signals that propagate as in discrete and continuous cellular automata. Selection scales along the hyperparameter dimensions too, and opens up a new class of behavior.</p>
+
+<figure>
+  <div class="rollouts cols-2">
+    <div class="rollout"><video src="/blog/pbt-nca/media/extended-iter020.mp4" poster="/blog/pbt-nca/media/extended-iter020.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Sharp borders</b> · meta-iter 20</span></div>
+    <div class="rollout"><video src="/blog/pbt-nca/media/extended-circuits.mp4" poster="/blog/pbt-nca/media/extended-circuits.png" muted loop playsinline controls preload="none"></video><span class="rollout-label"><b>Circuits</b></span></div>
+  </div>
+  <figcaption><b>The extended search space, three agents.</b> Left: territories with sharp, straight borders and a striped, circuit-like structure growing in one corner. Right: a later world in which striped, wire-like structures spread through a red territory like the traces of a circuit board.</figcaption>
+</figure>
+
+<h2 id="open-ended">Novelty that does not run out</h2>
+
+<p>If the pressure works, new behaviors should keep appearing for as long as the run lasts. The mean composite score \(\bar{\mathcal{F}}\), the average of \(\mathcal{F}_i\) over the 30 worlds of the population, makes this measurable: in every configuration it first declines, then climbs steadily and stays up. The hero at the top of this post steps through one run with seven agents per world; here it is as in the paper, with frames of the highest-scoring world along the way.</p>
+
+<figure>
+  <img src="/blog/pbt-nca/media/fig-timeline.png" alt="Mean composite score over 500 meta-iterations for one run with seven agents per world, with frames of the highest-scoring world at thirteen meta-iterations" width="1916" height="830">
+  <figcaption><b>One run, 30 worlds of seven agents.</b> The population's mean composite score over 500 meta-iterations (rolling mean over 10), with frames of the highest-scoring world at thirteen of them. Eight of these rollouts play in the hero above.</figcaption>
+</figure>
+
+<p>The picture is the same with three, five and seven agents per world, over three runs each. Worlds with more agents keep more novelty late in training. Selection also has a clear preference about how worlds should learn: the best world drifts toward higher learning rates and smaller batches, noisier and faster updates that keep it from collapsing into a stagnant equilibrium.</p>
+
+<figure>
+  <img src="/blog/pbt-nca/media/fig-scores.png" alt="Mean composite score and mean novelty over meta-iterations for PBT-NCA with 3, 5 and 7 agents and for random search with 3 agents" width="1010" height="608">
+  <figcaption><b>Composite score and novelty, with 3, 5 and 7 agents.</b> Mean composite score (solid, left axis) and mean novelty (dashed, right axis) of the population over meta-iterations, mean ± std over three runs each, together with the random-search baseline.</figcaption>
+</figure>
+
+<figure>
+  <img src="/blog/pbt-nca/media/fig-hparams.png" alt="Learning rate, batch size and steps per update of the best world over 500 meta-iterations, seven agents" width="1014" height="705">
+  <figcaption><b>How the best world learns (seven agents).</b> Learning rate, batch size and steps per update of the population's best member at each meta-iteration; dots are the sampled values.</figcaption>
+</figure>
+
+<h2 id="edge-of-chaos">At the edge of chaos</h2>
+
+<p>Complex behavior is expected in the narrow regime between frozen order and structureless randomness, the edge of chaos. Two metrics test whether PBT-NCA operates there, tracked over the 500 meta-iterations of the seven-agent runs. Ecological persistence is the fraction of frames in which several species coexist,</p>
+
+\[\mathrm{EP} = \dfrac{|\{t : H^t > \varepsilon\}|}{T}, \qquad \varepsilon = 0.1\,\log_2 N,\]
+
+<p>where \(H^t\) is the per-pixel entropy of the agents' aliveness at time \(t\). It is low under extinction and under monoculture alike. Effective complexity, after Gell-Mann and Lloyd, multiplies the normalized spatial entropy of a frame by its compressibility,</p>
+
+\[C^t_{\mathrm{eff}} = H(\mathrm{grid}_t)\,\left(1 - L_{\mathrm{Z77}}(\mathrm{grid}_t)\right),\]
+
+<p>so it vanishes for pure order (\(H \approx 0\)) and for pure noise (\(L_{\mathrm{Z77}} \approx 1\)), and peaks only when a pattern is varied and structured at once.</p>
+
+<div class="numbers">
+  <div class="num"><div class="v">≈ 1.0</div><div class="l">ecological persistence<br>frames with coexisting species</div></div>
+  <div class="num"><div class="v">2.3 bits</div><div class="l">mean species entropy<br>82% of the maximum</div></div>
+  <div class="num"><div class="v">0.21 ± 0.05</div><div class="l">mean effective<br>complexity</div></div>
+  <div class="num"><div class="v">30 × 500</div><div class="l">worlds ×<br>meta-iterations</div></div>
+</div>
+
+<p>Ecological persistence stays at 1.0 for most of training, with brief dips: in most rollouts, several species stay above threshold in every frame. The mean species entropy is about 2.3 bits, 82% of the maximum \(\log_2 7\). Effective complexity averages 0.21 ± 0.05, well above the zero of both the ordered and the chaotic regime, and within individual rollouts the later runs hold it flat and elevated. The competitive pressure keeps the population at the edge of chaos instead of letting it drift to either side.</p>
+
+<figure>
+  <img src="/blog/pbt-nca/media/fig-edge-of-chaos.png" alt="Species entropy and effective complexity over rollout frames colored by meta-iteration, and ecological persistence and effective complexity over meta-iterations" width="1015" height="1152">
+  <figcaption><b>Edge-of-chaos metrics, seven agents.</b> Top: species entropy and effective complexity over the frames of individual rollouts, colored by meta-iteration. Bottom: ecological persistence (blue) and effective complexity (green) per meta-iteration, with the mean composite score (dashed).</figcaption>
+</figure>
+
+<h2 id="why">Why it keeps going</h2>
+
+<p>We think the sustained diversity comes from Red Queen dynamics. No agent can settle, because the agents around it keep adapting, and no world can settle, because the score rewards lineages that break away from both the archived past and the present population. Because inheritance is Lamarckian, descendants start from partly developed ecologies rather than from scratch, so survival strategies can compound over generations instead of being rediscovered every time.</p>
+
+<p>The natural next steps are scale and co-evolution. Hardware-accelerated frameworks such as <a href="https://arxiv.org/abs/2410.02651" target="_blank" rel="noopener">CAX</a> and evolution strategies at hyperscale should allow much larger grids and many more agents, and with them a study of how emergent dynamics in PD-NCA scale. Beyond hyperparameters, the same loop could co-evolve architectures, environments and the update rules themselves.</p>
+
+<h2 id="cite">Citation</h2>
+
+<pre>@misc{berdica2026pbtnca,
+  title         = {Evolving Many Worlds: Towards Open-Ended Discovery in Petri Dish NCA
+                   via Population-Based Training},
+  author        = {Uljad Berdica and Jakob Foerster and Frank Hutter and Arber Zela},
+  year          = {2026},
+  eprint        = {2604.11248},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.NE},
+  url           = {https://arxiv.org/abs/2604.11248}
+}</pre>
+
+<div class="post-footer">
+  Every clip and frame is a real PD-NCA rollout from the paper's experiments, re-encoded from the originals on the <a href="https://pbt-nca.github.io/" target="_blank" rel="noopener">project page</a> or taken from the paper; the remaining figures are from the paper. The contested cell evaluates the competition rule exactly as written above.
+</div>
+
+</div>
+</div>
