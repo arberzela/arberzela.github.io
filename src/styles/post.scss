@@ -1,0 +1,245 @@
+// =============================================================================
+// Long-form blog post (scoped under .post). Ported from the standalone post's
+// stylesheet and mapped onto the site tokens so it follows the light/dark theme.
+// =============================================================================
+@use "minimal-light" as ml;
+
+.post {
+  // Figure palette of the post (Okabe-Ito); lightened a little for dark backgrounds.
+  --post-blue: #0072b2;
+  --post-orange: #d55e00;
+  --post-green: #009e73;
+  --post-purple: #7b3fa0;
+  @include ml.dark {
+    --post-blue: #4ea8e0;
+    --post-orange: #f58a3c;
+    --post-green: #2ec49c;
+    --post-purple: #b48ae0;
+  }
+
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: 1.62;
+  color: var(--text);
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+  .wide { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+
+  a {
+    color: var(--accent);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.35);
+    &:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  }
+
+  // Hero -----------------------------------------------------------------
+  .hero { padding: 44px 0 10px; }
+  .hero .kicker {
+    margin-bottom: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .hero h1 {
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .hero .dek { margin: 0 0 26px; font-size: 23px; line-height: 1.4; color: var(--text-2); }
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    padding: 14px 0;
+    border-top: 1px solid var(--border-strong);
+    border-bottom: 1px solid var(--border-strong);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+    b { color: var(--text); font-weight: 600; }
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px 0 0;
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    a {
+      padding: 6px 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--text-2);
+      transition: color 0.2s, background-color 0.2s, border-color 0.2s, transform 0.2s var(--ease);
+      &:hover { color: #fff; background: var(--accent); border-color: transparent; transform: translateY(-1px); }
+    }
+  }
+
+  // Text -----------------------------------------------------------------
+  h2 {
+    margin: 54px 0 14px;
+    font-family: var(--font-display);
+    font-size: 30px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  h3 { margin: 32px 0 8px; font-family: var(--font-display); font-size: 21px; color: var(--text); }
+  p { margin: 0 0 18px; }
+  .lede { font-size: 21.5px; }
+  strong, b { color: var(--text); }
+
+  // Figures --------------------------------------------------------------
+  figure { margin: 26px 0 30px; }
+  figure img, figure video { display: block; width: 100%; height: auto; border-radius: 8px; }
+  figure video { background: #fff; }
+  figure img, figure video {
+    @include ml.dark { filter: brightness(0.92); }
+  }
+  figcaption { margin-top: 10px; font-family: var(--font-sans); font-size: 14.5px; line-height: 1.55; color: var(--muted); }
+  figcaption b { color: var(--text); font-weight: 600; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .two figure { margin: 0; }
+
+  // Boxes ----------------------------------------------------------------
+  .tldr {
+    margin: 30px 0;
+    padding: 18px 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    font-size: 17.5px;
+    .t { margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+    ol { margin: 0; padding-left: 22px; }
+    li { margin: 6px 0; }
+  }
+
+  .numbers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 26px 0 10px; }
+  .num {
+    padding: 14px 12px;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    .v { font-family: var(--font-display); font-size: 28px; font-weight: 700; line-height: 1.1; color: var(--accent); }
+    .l { margin-top: 6px; font-family: var(--font-sans); font-size: 13px; line-height: 1.35; color: var(--muted); }
+  }
+
+  .steps {
+    counter-reset: s;
+    margin: 10px 0 26px;
+    padding: 0;
+    list-style: none;
+    li { position: relative; padding: 10px 0 10px 54px; border-top: 1px solid var(--border-strong); }
+    li:last-child { border-bottom: 1px solid var(--border-strong); }
+    li::before {
+      counter-increment: s;
+      content: counter(s);
+      position: absolute;
+      left: 0;
+      top: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+    li:nth-child(1)::before { background: var(--post-orange); }
+    li:nth-child(2)::before { background: var(--post-blue); }
+    li:nth-child(3)::before { background: var(--post-purple); }
+    li:nth-child(4)::before { background: var(--post-green); }
+    b { font-family: var(--font-sans); font-size: 15px; letter-spacing: 0.02em; }
+  }
+
+  .theorem {
+    margin: 20px 0;
+    padding: 14px 18px;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    background: var(--surface);
+    font-size: 17.5px;
+    .name { margin-bottom: 4px; font-family: var(--font-mono); font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+  }
+  .note {
+    margin: 16px 0 22px;
+    padding: 10px 14px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  // Results table --------------------------------------------------------
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table.results {
+    width: 100%;
+    margin: 14px 0 8px;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    th, td { padding: 8px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    th { font-weight: 600; color: var(--muted); border-bottom: 2px solid var(--border-strong); white-space: normal; vertical-align: bottom; }
+    td:first-child, th:first-child { text-align: left; }
+    tr.ours td { background: rgba(var(--accent-rgb), 0.1); font-weight: 700; }
+    td.b { font-weight: 700; }
+    td.u { text-decoration: underline; text-underline-offset: 3px; }
+    .grp td { padding-top: 12px; text-align: left; font-style: italic; color: var(--muted); border-bottom: none; }
+  }
+  .tabnote { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+
+  pre {
+    padding: 14px 16px;
+    overflow-x: auto;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  .post-footer {
+    margin: 70px 0 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .o { color: var(--post-orange); }
+  .bl { color: var(--post-blue); }
+  .g { color: var(--post-green); }
+  .pu { color: var(--post-purple); }
+
+  // Pre-rendered math (inline SVG): follow the text colour in both themes.
+  .math svg, .math-display svg { overflow: visible; }
+  svg g[style*="fill"] { fill: currentColor !important; }
+  svg * { stroke-linejoin: round; stroke-linecap: butt; }
+  .math-display { padding: 2px 0; }
+
+  @media (max-width: 700px) {
+    font-size: 18px;
+    .hero h1 { font-size: 34px; }
+    .hero .dek { font-size: 20px; }
+    .lede { font-size: 19px; }
+    .two { grid-template-columns: 1fr; }
+    .numbers { grid-template-columns: repeat(2, 1fr); }
+  }
+}

@@ -1,130 +1,162 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import { siteConfig } from '../config';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 import '../styles/style.scss';
-import '../styles/publications.css';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Path of a social-preview image; defaults to the avatar. */
+  image?: string;
+  /** "sidebar": profile card + content column (home, blog index). "wide": full-width article (posts). */
+  variant?: 'sidebar' | 'wide';
 }
 
-const { title = siteConfig.title, description = siteConfig.description } = Astro.props;
+const { title = siteConfig.title, description = siteConfig.description, image, variant = 'sidebar' } = Astro.props;
+const fontMode = siteConfig.font === 'Serif' ? 'serif' : 'sans';
+const pageTitle = title === siteConfig.title ? `${siteConfig.title} | ${siteConfig.affiliation}` : `${title} | ${siteConfig.title}`;
+const ogImage = Astro.site ? new URL(image ?? siteConfig.avatar, Astro.site).href : (image ?? siteConfig.avatar);
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const isArticle = variant === 'wide';
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-font={fontMode} data-theme={siteConfig.autoDarkMode ? undefined : 'light'}>
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{title} | {siteConfig.affiliation}</title>
-    
+    <title>{pageTitle}</title>
+
     <meta name="description" content={description}>
     <meta name="keywords" content={siteConfig.keywords}>
-    
+    <meta name="author" content={siteConfig.title}>
+    <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0a0e17" media="(prefers-color-scheme: dark)">
+    <meta property="og:type" content={isArticle ? 'article' : 'website'}>
+    <meta property="og:title" content={title}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content={ogImage}>
+    <meta name="twitter:card" content="summary_large_image">
+    {canonical && <link rel="canonical" href={canonical}>}
+
+    <!-- Client-side navigation with view transitions; the background canvas persists across pages. -->
+    <ClientRouter />
+
+    <!-- Apply the stored theme before first paint (avoids a flash), and flag JS availability
+         so scroll-reveal styles only apply when the scripts will actually run. -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'dark' || t === 'light') d.setAttribute('data-theme', t);
+        } catch (e) {}
+        // Safety net: if the UI script never runs, show everything after a moment.
+        setTimeout(function () {
+          if (!d.classList.contains('ui-ready')) d.classList.add('reveal-all');
+        }, 2500);
+      })();
+    </script>
+
     <!-- Favicons -->
     <link rel="icon" media="(prefers-color-scheme:dark)" href={siteConfig.faviconDark} type="image/png" />
     <link rel="icon" media="(prefers-color-scheme:light)" href={siteConfig.favicon} type="image/png" />
-    
+
     <!-- Academic Icons & Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
+
     <!-- Fonts -->
-    {siteConfig.font === "Sans Serif" ? (
-      <link rel="stylesheet" href="/assets/css/font_sans_serif.css">
-    ) : (
-      <link rel="stylesheet" href="/assets/css/font.css">
-    )}
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
     <script is:inline src="/assets/js/favicon-switcher.js"></script>
   </head>
   <body>
-    <div class="wrapper">
-      <header id="header">
-        {siteConfig.avatar && (
-          <a class="image avatar"><img src={siteConfig.avatar} alt="avatar" /></a>
-        )}
-        
-        <h1>{siteConfig.title}</h1>
-        
-        {siteConfig.position && (
-          <>
-            <position style="font-size:1.10rem;">{siteConfig.position}</position>
-            <br>
-          </>
-        )}
-        
-        {siteConfig.affiliation && (
-          <>
-            <a href="#" rel="noopener"><autocolor>{siteConfig.affiliation}</autocolor></a>
-            <br>
-          </>
-        )}
-        
-        {siteConfig.email && (
-          <email>{siteConfig.email}</email>
-        )}
-        
-        <br>
-        <br>
-        
-        <div class="social-icons">
-          {siteConfig.googleScholar && (
-            <a style="margin: 0 5px 0 0" href={siteConfig.googleScholar}>
-              <i class="ai ai-google-scholar" style="font-size:1.2rem"></i>
-            </a>
-          )}
-          
-          {siteConfig.cvLink && (
-            <a style="margin: 0 5px 0 0" href={siteConfig.cvLink}>
-              <i class="ai ai-cv" style="font-size:1.3rem;"></i>
-            </a>
-          )}
-          
-          {siteConfig.githubLink && (
-            <a style="margin: 0 5px 0 0" href={siteConfig.githubLink}>
-              <i class="fab fa-github"></i>
-            </a>
-          )}
-          
-          {siteConfig.linkedin && (
-            <a style="margin: 0 5px 0 0" href={siteConfig.linkedin}>
-              <i class="fab fa-linkedin"></i>
-            </a>
-          )}
-          
-          {siteConfig.twitter && (
-            <a style="margin: 0 0 0 0" href={siteConfig.twitter}>
-              <i class="fab fa-x-twitter"></i>
-            </a>
-          )}
-        </div>
-        <br>
-      </header>
-      
-      <section>
+    <div class="bg-blobs" aria-hidden="true" transition:persist="blobs"><span></span><span></span><span></span></div>
+    <canvas id="bg-canvas" aria-hidden="true" transition:persist="canvas"></canvas>
+
+    <SiteHeader variant={variant} />
+
+    {variant === 'sidebar' ? (
+      <div class="wrapper">
+        <aside class="sidebar">
+          <div class="profile" data-tilt="2">
+            {siteConfig.avatar && (
+              <div class="avatar-wrap">
+                <img src={siteConfig.avatar} alt={siteConfig.title} width="148" height="148" />
+              </div>
+            )}
+
+            <div class="profile-main">
+              <h1 class="name"><span>{siteConfig.title}</span></h1>
+              {siteConfig.position && <p class="role">{siteConfig.position}</p>}
+              {siteConfig.affiliation && <p class="affiliation">{siteConfig.affiliation}</p>}
+              {siteConfig.email && <span class="email">{siteConfig.email}</span>}
+
+              <div class="social">
+                {siteConfig.googleScholar && (
+                  <a href={siteConfig.googleScholar} target="_blank" rel="noopener" title="Google Scholar" aria-label="Google Scholar">
+                    <i class="ai ai-google-scholar" aria-hidden="true"></i>
+                  </a>
+                )}
+                {siteConfig.cvLink && (
+                  <a href={siteConfig.cvLink} target="_blank" rel="noopener" title="Curriculum Vitae" aria-label="Curriculum Vitae">
+                    <i class="ai ai-cv" aria-hidden="true"></i>
+                  </a>
+                )}
+                {siteConfig.githubLink && (
+                  <a href={siteConfig.githubLink} target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
+                    <i class="fab fa-github" aria-hidden="true"></i>
+                  </a>
+                )}
+                {siteConfig.linkedin && (
+                  <a href={siteConfig.linkedin} target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+                  </a>
+                )}
+                {siteConfig.twitter && (
+                  <a href={siteConfig.twitter} target="_blank" rel="noopener" title="X / Twitter" aria-label="X / Twitter">
+                    <i class="fab fa-x-twitter" aria-hidden="true"></i>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="content">
+          <slot />
+          <SiteFooter />
+        </main>
+      </div>
+    ) : (
+      <main class="wide-page">
         <slot />
-        
-        <br>
-        
-        {siteConfig.enableFootnote && (
-          <p><small>Powered by Astro and <a href="https://github.com/yaoyao-liu/minimal-light" target="_blank" rel="noopener">Minimal Light</a> theme.</small></p>
-        )}
-      </section>
-      
-      <footer></footer>
-    </div>
-    
-    <script is:inline src="/assets/js/scale.fix.js"></script>
-    
+        <SiteFooter />
+      </main>
+    )}
+
+    <button type="button" class="to-top" data-to-top aria-label="Back to top">
+      <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script>
+      import '../scripts/ui';
+      import '../scripts/background';
+    </script>
+
     {siteConfig.googleAnalytics && (
-      <script is:inline define:vars={{ ga: siteConfig.googleAnalytics }}>
+      <script is:inline define:vars={{ gaId: siteConfig.googleAnalytics }}>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
         })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-        ga('create', ga, 'auto');
+        ga('create', gaId, 'auto');
         ga('send', 'pageview');
       </script>
     )}

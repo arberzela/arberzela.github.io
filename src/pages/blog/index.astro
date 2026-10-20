@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import { posts } from '../../data/posts';
+
+// Post bodies are plain HTML files; load them only to estimate reading time.
+const bodies = import.meta.glob('../../content/blog/*/body.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+
+function readingTime(slug: string): number {
+  const html = bodies[`../../content/blog/${slug}/body.html`] ?? '';
+  const words = html
+    .replace(/<svg[\s\S]*?<\/svg>/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.round(words / 220));
+}
+
+const formatDate = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+
+const sorted = [...posts].sort((a, b) => b.date.localeCompare(a.date));
+---
+
+<BaseLayout title="Blog" description="Longer write-ups of papers and ideas by Arber Zela, with the figures and animations that did not fit in the PDF.">
+  <section class="block" id="blog">
+    <SectionHead index="06" title="Blog" />
+    <p class="lead" data-reveal>
+      Longer write-ups of papers and ideas, with the figures and animations that did not fit in the PDF.
+    </p>
+    <ul class="post-list">
+      {sorted.map((post, i) => (
+        <li class="post-card" data-reveal data-tilt="3" style={`--i:${i + 1}`}>
+          <a class="cover" href={`/blog/${post.slug}/`} tabindex="-1" aria-hidden="true">
+            <img src={post.cover} alt="" loading="lazy" decoding="async" />
+          </a>
+          <div class="body">
+            <div class="meta">
+              <span>{formatDate(post.date)}</span>
+              <span aria-hidden="true">·</span>
+              <span>{readingTime(post.slug)} min read</span>
+            </div>
+            <h3><a href={`/blog/${post.slug}/`}>{post.title}</a></h3>
+            <p class="subtitle">{post.subtitle}</p>
+            <p class="summary">{post.summary}</p>
+            <div class="tags">{post.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
+            <div class="more">
+              <a class="pill" href={`/blog/${post.slug}/`}><i class="fas fa-arrow-right" aria-hidden="true"></i>Read the post</a>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

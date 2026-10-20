@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spherical Fixed-Point Reasoners: adaptive loop halting on the hypersphere</title>
+<meta name="description" content="Run a looped transformer's fixed-point solver on the unit sphere: the state cannot blow up, halting becomes an angle, and the geometry of the computation becomes readable.">
+<meta property="og:title" content="Spherical Fixed-Point Reasoners">
+<meta property="og:description" content="Adaptive loop halting on the hypersphere.">
+<meta property="og:type" content="article">
+<!-- Math is rendered by MathJax from a CDN; the page reads fine without it, the formulas just stay as TeX. -->
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root {
+    --text: #1c1c1c; --muted: #6b6b6b; --light: #9a9a9a; --rule: #e6e6e6;
+    --blue: #0072B2; --orange: #D55E00; --green: #009E73; --purple: #7B3FA0;
+    --bg: #ffffff; --panel: #f7f9fc; --panel-border: #dfe7f0;
+    --serif: "Source Serif Pro", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--serif); font-size: 19px; line-height: 1.62; -webkit-font-smoothing: antialiased; }
+  a { color: var(--blue); text-decoration: none; border-bottom: 1px solid #bcd6e8; }
+  a:hover { border-bottom-color: var(--blue); }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+  .wide { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+
+  header.hero { padding: 56px 0 10px; }
+  header.hero .kicker { font-family: var(--sans); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--light); margin-bottom: 14px; }
+  header.hero h1 { font-size: 44px; line-height: 1.12; margin: 0 0 10px; font-weight: 700; letter-spacing: -.01em; }
+  header.hero .dek { font-size: 23px; line-height: 1.4; color: var(--muted); margin: 0 0 26px; }
+  .byline { font-family: var(--sans); font-size: 15px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 14px 0; display: flex; flex-wrap: wrap; gap: 8px 28px; }
+  .byline b { color: var(--text); font-weight: 600; }
+  .links { font-family: var(--sans); font-size: 15px; margin: 18px 0 0; display: flex; gap: 10px; flex-wrap: wrap; }
+  .links a { border: 1px solid #cfdbe6; border-radius: 999px; padding: 6px 14px; background: #fff; }
+  .links a:hover { background: var(--panel); }
+
+  h2 { font-size: 30px; line-height: 1.2; margin: 54px 0 14px; letter-spacing: -.01em; }
+  h3 { font-size: 21px; margin: 32px 0 8px; }
+  p { margin: 0 0 18px; }
+  .lede { font-size: 21px; }
+  figure { margin: 26px 0 30px; }
+  figure.wide { max-width: 980px; margin-left: auto; margin-right: auto; }
+  figure img, figure video { width: 100%; height: auto; display: block; border-radius: 6px; }
+  figure video { background: #fff; }
+  figcaption { font-family: var(--sans); font-size: 14.5px; line-height: 1.55; color: var(--muted); margin-top: 10px; }
+  figcaption b { color: var(--text); font-weight: 600; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .two figure { margin: 0; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } header.hero h1 { font-size: 34px; } body { font-size: 17.5px; } }
+
+  .tldr { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 10px; padding: 18px 22px; margin: 30px 0; font-size: 17.5px; }
+  .tldr .t { font-family: var(--sans); font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; font-weight: 600; }
+  .tldr ol { margin: 0; padding-left: 22px; }
+  .tldr li { margin: 6px 0; }
+
+  .numbers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 26px 0 10px; }
+  .num { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 14px 12px; text-align: center; }
+  .num .v { font-family: var(--sans); font-size: 28px; font-weight: 700; color: var(--blue); line-height: 1.1; }
+  .num .l { font-family: var(--sans); font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.35; }
+  @media (max-width: 700px) { .numbers { grid-template-columns: repeat(2, 1fr); } }
+
+  .steps { counter-reset: s; margin: 10px 0 26px; padding: 0; list-style: none; }
+  .steps li { position: relative; padding: 10px 0 10px 54px; border-top: 1px solid var(--rule); }
+  .steps li:last-child { border-bottom: 1px solid var(--rule); }
+  .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 11px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--sans); font-weight: 700; font-size: 15px; color: #fff; }
+  .steps li:nth-child(1)::before { background: var(--orange); }
+  .steps li:nth-child(2)::before { background: var(--blue); }
+  .steps li:nth-child(3)::before { background: var(--purple); }
+  .steps li:nth-child(4)::before { background: var(--green); }
+  .steps b { font-family: var(--sans); font-size: 15px; letter-spacing: .02em; }
+
+  .theorem { border-left: 3px solid var(--blue); background: var(--panel); padding: 14px 18px; margin: 20px 0; border-radius: 0 8px 8px 0; font-size: 17.5px; }
+  .theorem .name { font-family: var(--sans); font-weight: 600; font-size: 14px; color: var(--blue); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 4px; }
+  .note { font-family: var(--sans); font-size: 15px; color: var(--muted); background: #fbfbfb; border: 1px dashed var(--rule); border-radius: 8px; padding: 10px 14px; margin: 16px 0 22px; }
+
+  table.results { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 14.5px; margin: 14px 0 8px; }
+  table.results th, table.results td { padding: 8px 8px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  table.results th { font-weight: 600; color: var(--muted); border-bottom: 2px solid #d0d0d0; }
+  table.results td:first-child, table.results th:first-child { text-align: left; }
+  table.results tr.ours td { background: #eef5fb; font-weight: 700; }
+  table.results td.b { font-weight: 700; }
+  table.results td.u { text-decoration: underline; text-underline-offset: 3px; }
+  table.results .grp td { color: var(--light); font-style: italic; text-align: left; border-bottom: none; padding-top: 12px; }
+  .tabnote { font-family: var(--sans); font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+
+  pre { background: #f4f4f4; border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px; line-height: 1.5; }
+  footer { margin: 70px 0 60px; font-family: var(--sans); font-size: 14px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 18px; }
+  .o { color: var(--orange); } .bl { color: var(--blue); } .g { color: var(--green); } .pu { color: var(--purple); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Paper · looped transformers · adaptive computation</div>
+    <h1>Spherical Fixed-Point Reasoners</h1>
+    <p class="dek">Run a looped transformer's fixed-point solver on the unit sphere and three things happen at once: the state cannot blow up, the halting test becomes an angle, and the geometry of the computation becomes readable.</p>
+    <div class="byline">
+      <span><b>Arber Zela</b>, <b>Artavazd Maranjyan</b>, <b>Pol Puigdemont</b>, <b>David Berghaus</b>, <b>Valentyn Boreiko</b>, <b>Volkan Cevher</b></span>
+      <span>EPFL · Lamarr Institute · Fraunhofer IAIS · Amazon AGI</span>
+      <span>October 2026</span>
+    </div>
+    <div class="links">
+      <a href="#">Paper (arXiv)</a>
+      <a href="https://github.com/arberzela/sfprm">Code</a>
+      <a href="#results">Results</a>
+      <a href="#cite">Cite</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="wide">
+  <figure>
+    <video src="media/post01_method_loop_walkthrough_iterate.mp4" autoplay muted loop playsinline controls preload="metadata"></video>
+    <figcaption><b>The idea in thirty seconds.</b> A looped transformer applies one block until its state stops moving. SFPRM runs that loop on the unit sphere: the input is injected by moving a fraction \(\lambda\) of the great-circle arc toward it, the damped update is a rotation by a fraction \(\eta_i\) of the way to the proposal, and the loop halts once the angle between every token and its proposal falls below \(\tau_{\mathrm{ang}}\). The second half shows three tokens of one sequence converging; the halt waits for the worst of them.</figcaption>
+  </figure>
+</div>
+
+<div class="wrap">
+
+<div class="tldr">
+  <div class="t">TL;DR</div>
+  <ol>
+    <li>Fixed-Point Reasoners (FPRM) make a looped transformer halt adaptively by treating the loop as a fixed-point solver, but in Euclidean space the residual stream is free to grow, so they need a boundedness theorem, four coupled rescaling coefficients and a normalized halting residual.</li>
+    <li>We run the same damped solver on nGPT's unit hypersphere. Injection, damping and halting become geodesic operations, boundedness holds by construction, and the coupling disappears.</li>
+    <li>We prove fixed-point existence from continuity and injection alone, local convergence of angular damping with an explicit step-size window, and global convergence under strong injection.</li>
+    <li>At 7M parameters SFPRM reaches 96.6% on Sudoku-Extreme, 87.9% on Maze-Hard and 59.1% on Mini-ARC, halts up to 2.7× earlier than FPRM, and the angle each token keeps to its input turns out to be a readable encoding of the task and a label-free predictor of correctness.</li>
+  </ol>
+</div>
+
+<h2 id="why">Looped transformers have to know when to stop</h2>
+
+<p class="lede">Scaling test-time compute is the main lever we have for making sequence models reason better. Chain-of-thought does it in token space. Looped transformers do it in latent space: a single weight-tied block is applied repeatedly, so depth becomes an iteration count chosen at inference time, and compute can be allocated per input according to how hard it is. On algorithmic puzzles such as Sudoku, mazes and ARC, this recipe lets models with a few million parameters compete with far larger ones.</p>
+
+<p>A looped model raises two questions. <em>When should it stop?</em> And <em>will it stay well-behaved as it runs?</em> The fixed-point view answers the first: treat the loop as a solver for \(\mathbf z^\star = F_\theta(\mathbf z^\star;\mathbf x)\) and halt once the iterate stops moving. Fixed-Point Reasoners (FPRM) turn this into a practical recipe: a damped iteration whose step size decays on a patience rule, a relative-norm residual as the halting test, and a boundedness theorem that keeps the recurrent state from diverging.</p>
+
+<p>The second question is where the Euclidean formulation shows its cost. Nothing in a pre-norm residual stream stops the norm of the state from growing as the block is applied again and again. To contain it, FPRM rescales the residual stream with four coefficients that a boundedness theorem ties together,</p>
+
+\[
+\beta_2 = 1-\alpha_2\alpha_1^{2D}, \qquad \beta_1 = \beta_2\,\frac{1-\alpha_1}{1-\alpha_1^{2D}},
+\]
+
+<p>and it has to divide the halting residual by the norm of the proposal, \(r_{\mathrm E,i} = \|\mathbf z_i-\tilde{\mathbf z}_i\|_\infty / (\|\tilde{\mathbf z}_i\|_\infty+\epsilon)\), to make the test scale-invariant. All of this machinery exists for one reason: the norm is not fixed.</p>
+
+<figure>
+  <video src="media/post02_fprm_euclidean.mp4" autoplay muted loop playsinline controls preload="metadata"></video>
+  <figcaption><b>Why the sphere.</b> Left, a cartoon of the residual stream: the iterates drift outward until the coupled update \(f(\alpha_2\mathbf z+\beta_2\mathbf x)\) pulls them back inside the bound that FPRM's theorem guarantees. Right, the pieces FPRM needs to make that work. (The dynamics on the left are illustrative, not a trained model.)</figcaption>
+</figure>
+
+<h2 id="method">The same loop, on the sphere</h2>
+
+<p>The normalized transformer (nGPT) gets stable dynamics by changing the <em>geometry</em> rather than adding control. Every hidden state lives on the unit hypersphere \(\mathbb S^{d-1}\), and each sub-layer is a learned angular move followed by renormalization, a retraction. The divergence that FPRM has to guard against simply cannot occur. Spherical Fixed-Point Reasoners (SFPRM) run FPRM's damped solver on this sphere, so that every control quantity of the loop becomes an angle.</p>
+
+<p>The one primitive we need is spherical linear interpolation. For unit vectors \(u,v\) at angle \(\Omega=\angle(u,v)\),</p>
+
+\[
+\mathrm{Slerp}_\eta(u,v)=\frac{\sin((1-\eta)\Omega)}{\sin\Omega}\,u+\frac{\sin(\eta\Omega)}{\sin\Omega}\,v
+\]
+
+<p>moves a fraction \(\eta\) of the way along the shortest great-circle arc from \(u\) to \(v\) and stays on the sphere. Applied token by token, it gives the four steps of one SFPRM iteration:</p>
+
+<ol class="steps">
+  <li><b class="o">INJECT</b> &nbsp; \(\hat{\mathbf z}_i=\mathrm{Slerp}_\lambda(\mathbf z_i,\mathbf x)\): move each token a fraction \(\lambda\) of the arc toward its input token. One angle replaces FPRM's affine mix \(\alpha_2\mathbf z+\beta_2\mathbf x\) and the coupling that came with it.</li>
+  <li><b class="bl">BLOCK</b> &nbsp; \(\tilde{\mathbf z}_i=f_\theta(\hat{\mathbf z}_i)\): the weight-tied nGPT block proposes a new point. Its attention and MLP sub-layers are retractions, so the proposal is on the sphere by construction.</li>
+  <li><b class="pu">DAMP</b> &nbsp; \(\mathbf z_{i+1}=\mathrm{Slerp}_{\eta_i}(\mathbf z_i,\tilde{\mathbf z}_i)\): rotate a fraction \(\eta_i\) of the way to the proposal. Each token turns by exactly \(\eta_i\,\angle(z_{i,t},\tilde z_{i,t})\), so \(\eta_i\) is an angular step size that FPRM's patience-based decay literally shrinks.</li>
+  <li><b class="g">HALT</b> &nbsp; stop once \(r_{\mathrm c,i}=\max_t\big(1-\langle z_{i,t},\tilde z_{i,t}\rangle\big)<\tau_c\), i.e. once every token's proposal lies within an angle \(\tau_{\mathrm{ang}}\) of its iterate (\(\tau_c=1-\cos\tau_{\mathrm{ang}}\); we use \(\tau_c=0.01\), about \(8.1^\circ\)). The residual is an angle; there is nothing to normalize.</li>
+</ol>
+
+<figure>
+  <img src="media/overview.png" alt="SFPRM architecture: input x, Slerp_lambda, spherical block, Slerp_eta, halting test, readout; and halting on the sphere">
+  <figcaption><b>Figure 1 of the paper.</b> (a) The outer loop and the spherical block, with QK-normalized attention and a SwiGLU MLP folded into the state by retractions \(R_{\alpha}\). (b) Halting on the sphere: each step rotates \(z_{i,t}\) a fraction \(\eta_i\) of the way to its proposal; the loop halts once \(\Omega_{i,t}<\tau_{\mathrm{ang}}\) for every token.</figcaption>
+</figure>
+
+<p>Everything else is FPRM. The step size starts at \(\eta=1\) and is multiplied by a decay factor whenever the residual has not improved for five consecutive iterations; training uses deep supervision with truncated backpropagation through one segment of six geodesic steps per optimizer step, with the carried state detached between segments. The readout is nGPT's: logits are \(s_z\,h_\phi(\mathbf z^\star)\) with a learned scale \(s_z\), and the rows of the head are left unnormalized so the head can set its own per-class scale while the state stays on the sphere.</p>
+
+<figure>
+  <video src="media/post03_fprm_to_sfprm_morph.mp4" autoplay muted loop playsinline controls preload="metadata"></video>
+  <figcaption><b>From FPRM to SFPRM, piece by piece.</b> Every Euclidean operation in FPRM's loop has a spherical counterpart: the affine injection becomes \(\mathrm{Slerp}_\lambda\), the \(\times\alpha_1,\times\beta_1\) residual rescaling inside the block becomes a retraction, linear damping becomes \(\mathrm{Slerp}_\eta\), the normalized \(\ell_\infty\) residual becomes the chordal residual, and the state space \(\mathbb R^d\) becomes \(\mathbb S^{d-1}\). What is <em>removed</em> is as telling as what is replaced: the four coefficients, their coupling and the \(\epsilon\) in the residual all exist to control magnitudes, and on the sphere there are none to control.</figcaption>
+</figure>
+
+<h2 id="theory">What the geometry buys analytically</h2>
+
+<p>Boundedness is now structural: injection and damping return unit vectors, the block does too, so the state stays on the sphere for every iteration and every \(\theta\). Recurrent magnitudes can neither explode nor vanish. But boundedness alone says nothing about whether a fixed point exists or is reached, so the paper proves three things about the exact recurrence.</p>
+
+<div class="theorem">
+  <div class="name">Fixed-point existence</div>
+  Fix \(\mathbf x\) and \(0<\lambda<1\). If \(f_\theta\) is continuous on the cap of states within \((1-\lambda)\pi\) of the input and never maps a state exactly onto the antipode of its input token, then \(F_\theta(\cdot\,;\mathbf x)\) has at least one fixed point on the sphere.
+</div>
+
+<p>On a sphere, continuity alone does not give you a fixed point: rotating a circle moves every point. Injection repairs this by keeping every injected state inside a cap around the input, which, unlike the sphere, can be flattened into a closed ball where Brouwer's theorem applies. No Lipschitz constant, contraction modulus or spectral bound is needed. FPRM proves existence only through global convergence, hence under a contraction assumption.</p>
+
+<div class="theorem">
+  <div class="name">Local convergence of angular damping</div>
+  Let \(J\) be the tangent Jacobian of \(F_\theta\) at a fixed point \(\mathbf z^\star\), and suppose every eigenvalue \(\zeta\) of \(J\) has \(\mathrm{Re}(\zeta)<1\). Then for every fixed step size
+  \[ \eta<\eta_{\max}:=\min_{\zeta\in\sigma(J)}\frac{2\,(1-\mathrm{Re}\,\zeta)}{|\zeta-1|^2} \]
+  the damped iteration converges to \(\mathbf z^\star\) geometrically from every sufficiently close initial state, and it has exactly the same fixed points as \(F_\theta\).
+</div>
+
+<p>The proof linearizes the damped step to \((1-\eta)\,\mathrm{Id}+\eta J\), which moves each eigenvalue a fraction \(\eta\) from \(1\) toward \(\zeta\); the window above is exactly what keeps them all inside the unit disk. Damping tames modes that oscillate or spiral away under the raw map, not expansive ones, which training has to remove. This is the spherical counterpart of FPRM's stabilization theorem, now with an explicit window and with unit norm preserved.</p>
+
+<div class="theorem">
+  <div class="name">Global convergence under strong injection</div>
+  If \(f_\theta\) is continuously differentiable near \(\mathbf x\) and does not map \(\mathbf x\) onto its own antipode, there is a \(\lambda_0\in(0,1)\) such that for every \(\lambda\in(\lambda_0,1)\) the raw recurrence \(\mathbf z_{i+1}=F_\theta(\mathbf z_i;\mathbf x)\) has a unique fixed point and converges to it geometrically from every initial state that is not antipodal to the input.
+</div>
+
+<p>In logarithmic coordinates at \(\mathbf x\), injection multiplies by \(1-\lambda\): for \(\lambda\) near one, the first injection pulls every admissible state into a small ball around the input on which the map is a Banach contraction. Together the three results cover every injection strength: a fixed point exists for all \(\lambda\), strong injection makes it a unique global attractor, and damping gives local convergence under weaker injection.</p>
+
+<div class="two">
+  <figure>
+    <img src="media/fig_uniq_b_density_sudoku_div5k.png" alt="Largest angle between end states of eight initializations against lambda">
+    <figcaption><b>Uniqueness against \(\lambda\).</b> The largest angle between the end states of eight initializations of the raw map on 32 Sudoku puzzles (teal: all coincide; coral: at least two distinct end states), with token accuracy on the right axis.</figcaption>
+  </figure>
+  <figure>
+    <img src="media/fig_traj_plane_sudoku_div5k_4lam.png" alt="Trajectories from eight initializations at four values of lambda">
+    <figcaption><b>Trajectories at four values of \(\lambda\).</b> From the eight starting states (squares) to \(\mathbf z^\star\) (star) in their top-2 principal plane, coloured by the token accuracy of the decoded state.</figcaption>
+  </figure>
+</div>
+
+<p>We checked the last theorem on the trained Sudoku model by overriding \(\lambda\) at inference and running the undamped map from eight initializations, including the input and its antipode, which the theorem excludes. For \(\lambda\ge 0.8\) all eight end states coincide on every puzzle. At the learned \(\lambda=0.47\) the raw map already reaches an attracting fixed point on 91% of the puzzles, and on the puzzle shown above all eight paths end inside the exact-match region. There is a trade-off hiding in the figure, though: for \(\lambda\ge 0.7\) the iteration converges within a few steps to a unique fixed point that no longer solves the puzzle. Injection that is strong enough to make the map a contraction leaves too little room for computation.</p>
+
+<h2 id="results">Results</h2>
+
+<p>We evaluate on Sudoku-Extreme, Maze-Hard, Mini-ARC and ARC-1, which test generalization from a small number of training examples. SFPRM and FPRM share a 6.83M-parameter transformer backbone and FPRM's hyperparameters. SFPRM trains its weight matrices with Muon and everything else with AdamW, learns the injection fraction \(\lambda\) except on Sudoku where it is fixed at \(0.1\), and halts at \(\tau_c=0.01\). Every number is a single seed.</p>
+
+<div class="numbers">
+  <div class="num"><div class="v">96.6%</div><div class="l">Sudoku-Extreme<br>FPRM: 94.2%</div></div>
+  <div class="num"><div class="v">87.9%</div><div class="l">Maze-Hard<br>FPRM: 87.0%</div></div>
+  <div class="num"><div class="v">59.1%</div><div class="l">Mini-ARC<br>FPRM: 55.0%</div></div>
+  <div class="num"><div class="v">2.7×</div><div class="l">fewer iterations to halt<br>on Sudoku-Extreme</div></div>
+</div>
+
+<table class="results">
+  <thead><tr><th>Model</th><th>Params</th><th>Sudoku-Ext. Pass@1</th><th>Maze-Hard Pass@1</th><th>Mini-ARC Pass@1</th><th>ARC-1 Pass@2</th></tr></thead>
+  <tbody>
+    <tr class="grp"><td colspan="6">Larger models</td></tr>
+    <tr><td>HRM</td><td>27M</td><td>55.0</td><td>74.5</td><td>44.9 (51.7)</td><td>40.3</td></tr>
+    <tr><td>Attractor Model</td><td>27M</td><td>91.4</td><td>93.1</td><td>—</td><td>—</td></tr>
+    <tr><td>URM</td><td>14M</td><td>77.6</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr class="grp"><td colspan="6">5–7M models</td></tr>
+    <tr><td>TRM</td><td>7M</td><td>74.7</td><td>85.3</td><td>48.4 (36.9)</td><td>44.6</td></tr>
+    <tr><td>EqR</td><td>5–7M</td><td>93.0</td><td>—</td><td class="u">55.3 (40.3)</td><td>—</td></tr>
+    <tr><td>Attractor Model</td><td>7M</td><td>54.3</td><td>46.7</td><td>—</td><td>—</td></tr>
+    <tr><td>FPRM</td><td>7M</td><td class="u">94.2 (78.4)</td><td class="u">87.0 (83.9)</td><td>— (55.0)</td><td class="b">47.5</td></tr>
+    <tr class="ours"><td>SFPRM (ours)</td><td>7M</td><td>96.6</td><td>87.9</td><td>59.1</td><td class="u">47.4</td></tr>
+  </tbody>
+</table>
+<p class="tabnote">Published numbers from the respective papers; values in parentheses are our own runs under the same protocol as SFPRM. Within the 5–7M group the best result is bold and the second best underlined. Our own FPRM runs fell short of the published 94.2 and 87.0, so we compare against the published numbers and use the released checkpoints for all FPRM evaluations below.</p>
+
+<p>Confining the state to the sphere does not cost accuracy; it improves it. On Sudoku-Extreme SFPRM reaches 96.6% exact accuracy, 2.4 points above FPRM, trained on 5k base puzzles augmented 200× rather than FPRM's 1k puzzles augmented 1000×, the same number of training examples but five times as many distinct puzzles. On Maze-Hard it reaches 87.9% on the 1,000 test mazes, above TRM and FPRM and behind only the 27M-parameter Attractor model. On Mini-ARC it reaches 59.1% Pass@1, above the best published result in its size group and above every baseline retrained under our protocol. On ARC-1 it matches FPRM.</p>
+
+<figure>
+  <video src="media/post04_results_and_halting.mp4" autoplay muted loop playsinline controls preload="metadata"></video>
+  <figcaption><b>Accuracy and halting.</b> Exact accuracy against the recurrent reasoners of Table 1 (y-axes truncated so the gaps are visible), then the mean iteration at which the sequences that halt do so. On Maze-Hard SFPRM halts on 992 of 1,000 mazes against FPRM's 950, on average 22 iterations earlier (108 vs. 130). On Sudoku-Extreme, with the learned \(\lambda=0.47\), it halts at a mean of 33 iterations against 89.</figcaption>
+</figure>
+
+<h3>Halting</h3>
+
+<p>To see how the two solvers converge and when they stop, we run each trained model with halting disabled, decode every iterate, and record the residual its solver tests. Both residuals fall quickly, and both models saturate their accuracy within 20 to 35 iterations, so every later loop is spent after the answer has stopped changing. SFPRM converges faster and stops sooner. A detail worth knowing: on Sudoku, the puzzles a solver halts on are solved in 99.7 to 100% of cases, so a halt certifies the answer, whereas a missing halt does not certify a failure.</p>
+
+<figure>
+  <img src="media/fig_halting_lines_sat_hf_lamvdw_full1k.png" alt="Exact accuracy and halting residual over iterations on Maze-Hard for SFPRM and FPRM" style="max-width: 520px; margin: 0 auto;">
+  <figcaption><b>Open-loop rollouts on Maze-Hard</b> (1,000 test mazes). Top: exact accuracy of the decoded state, with each model's mean halt iteration and the number of sequences that halt. Bottom: every sequence's halting residual (thin) and its median (heavy) against its own threshold.</figcaption>
+</figure>
+
+<h3>Swapping the solver at inference</h3>
+
+<p>Because the loop is a genuine fixed-point solve, the damped step can be replaced at inference by a standard solver without touching the model or the halting rule. Anderson acceleration halts earlier than the default solver on every Maze example while staying within one point of its accuracy, and on Sudoku it brings the median halt from 435 iterations down to 37, nine times fewer evaluations of the block averaged over all examples. Limited-memory Broyden, the solver used for deep equilibrium models, reaches the tolerance about as fast but then leaves the fixed point and degrades, so it is usable only with halting. Without damping, 37 to 100% of the examples never reach the tolerance at all. Training with these solvers, rather than swapping them in at inference, is left for future work.</p>
+
+<div class="two">
+  <figure>
+    <img src="media/fig_population_combo_maze.png" alt="Accuracy per solver on Maze with halting disabled">
+    <figcaption><b>Accuracy per solver</b> on Maze-Hard with halting disabled.</figcaption>
+  </figure>
+  <figure>
+    <img src="media/fig_maze_ex938_wall_adaptive_anderson_broyden.png" alt="Path-token trajectory per solver in polar coordinates">
+    <figcaption><b>One path token under each solver.</b> The radius is the geodesic angle (log-scaled) to \(\mathbf z^\star\); rings at \(0.1/1/10/100^\circ\).</figcaption>
+  </figure>
+</div>
+
+<h2 id="geometry">The geometry is readable</h2>
+
+<p>On the sphere a token state has only one free quantity, its direction, so we can probe what the loop writes into the state through a single number per cell: the <em>anchor angle</em> \(\angle(z_{i,t},x_t)\) between a cell's iterate and its own unit-normalized input embedding, the quantity that injection acts on.</p>
+
+<figure>
+  <video src="media/post05_anchor_angle_and_correctness.mp4" autoplay muted loop playsinline controls preload="metadata"></video>
+  <figcaption><b>Where the cells go.</b> On Sudoku, clue cells rotate toward their input and settle about \(52^\circ\) from it; blank cells end near orthogonal, about \(88^\circ\). The small dots are the other cells of the same puzzle collecting on the two rings. The second half shows the final angles of clue and blank cells on solved versus unsolved puzzles.</figcaption>
+</figure>
+
+<div class="two">
+  <figure>
+    <img src="media/sudoku_rollout.gif" alt="SFPRM Sudoku rollout: decoded board and anchor angle map over iterations">
+    <figcaption><b>Sudoku-Extreme, one test puzzle.</b> Left, the decoded board; right, each cell's anchor angle. By the end the angle map is a binary image of the clue mask: dark cells are clues, green cells are blanks.</figcaption>
+  </figure>
+  <figure>
+    <img src="media/maze_rollout.gif" alt="SFPRM Maze rollout: decoded maze and anchor angle map over iterations">
+    <figcaption><b>Maze-Hard, one test maze.</b> Walls settle at about \(90^\circ\), empty cells at \(113^\circ\) and path cells at \(102^\circ\). Empty and path cells receive the same input token, so the split between them is computed by the loop rather than copied from the input.</figcaption>
+  </figure>
+</div>
+
+<p>Each loop iteration writes the cell's class into the direction of its state. FPRM, by contrast, encodes the Sudoku clue mask mainly in the <em>norm</em> of its state, a scale set by training rather than by the geometry; its anchor-angle map shows only small differences between clues and blanks, and on Maze it separates walls from free cells but not path cells from empty ones. On Mini-ARC the cells a task rewrites end furthest from their input under SFPRM, with an AUC of 0.81 for telling rewritten cells from the rest, while FPRM's ordering varies from task to task (AUC 0.51).</p>
+
+<figure>
+  <video src="media/post08_miniarc_rollouts.mp4" autoplay muted loop playsinline controls preload="metadata"></video>
+  <figcaption><b>Four Mini-ARC test tasks.</b> For each: input and target, the decoded grid as the loop runs (a cross marks a cell that still differs from the target), and the anchor-angle map, which singles out the cells the task rewrites.</figcaption>
+</figure>
+
+<figure>
+  <img src="media/fig_anchor_angle_pair.png" alt="Anchor angles by cell class on Maze over loop iterations for SFPRM and FPRM" style="max-width: 640px; margin: 0 auto;">
+  <figcaption><b>Anchor angles by cell class on Maze</b>: individual cells (thin lines), class means (heavy), the halt iteration (vertical line) and the final distribution (margin), for SFPRM and FPRM.</figcaption>
+</figure>
+
+<h3>The final angle predicts correctness</h3>
+
+<p>The same quantity flags wrong answers without any label. On the Sudoku puzzles SFPRM fails to solve, both cell classes end farther from their anchors: the clues at about \(65^\circ\) instead of \(52^\circ\), almost disjoint from the solved puzzles, and the blanks at \(92^\circ\) instead of \(88^\circ\). FPRM's final norms separate the two outcomes far less; its clue and blank norms overlap widely.</p>
+
+<figure>
+  <img src="media/fig_angle_solved_vs_unsolved_ep15k.png" alt="Final anchor angle for solved and unsolved Sudoku puzzles, SFPRM angle vs FPRM norm" style="max-width: 640px; margin: 0 auto;">
+  <figcaption><b>Final anchor angle against correctness</b> on 512 Sudoku puzzles: angle (SFPRM, left) and state norm (FPRM, right) of clue and blank cells, for solved (filled) and unsolved (hatched) puzzles.</figcaption>
+</figure>
+
+<h2 id="limits">Limitations and what comes next</h2>
+
+<p>Everything here is on puzzle benchmarks, with one seed per run, and the FPRM comparison leans on published numbers because our own FPRM runs fell short of them. ARC-1 is a tie, not a win. The better solvers were only swapped in at inference; training with them is the obvious next step, as is scaling SFPRM to language modeling, where the question of when a looped model should stop is at least as pressing as it is on Sudoku. The global-convergence regime also comes with a warning built in: injection strong enough to guarantee a unique attractor also removes the model's room to compute, so the useful operating point is the one the theory covers locally, not globally.</p>
+
+<figure>
+  <video src="media/post09_what_changed.mp4" autoplay muted loop playsinline controls preload="metadata"></video>
+  <figcaption><b>What changed.</b> Bounded by construction, no coupled coefficients, no normalization in the halting test, and the same damped solver as FPRM, now made of geodesic moves.</figcaption>
+</figure>
+
+<h2 id="cite">Paper, code and citation</h2>
+
+<p>The paper is on arXiv and the code, built on top of the public FPRM code base, is at <a href="https://github.com/arberzela/sfprm">github.com/arberzela/sfprm</a>. The implementation was assisted by Claude and verified by the authors.</p>
+
+<pre>@article{zela2026sfprm,
+  title   = {Spherical Fixed-Point Reasoners: Adaptive Loop Halting on the Hypersphere},
+  author  = {Zela, Arber and Maranjyan, Artavazd and Puigdemont, Pol and Berghaus, David
+             and Boreiko, Valentyn and Cevher, Volkan},
+  journal = {arXiv preprint arXiv:XXXX.XXXXX},
+  year    = {2026}
+}</pre>
+
+<footer>
+  Written by the authors. The schematic dynamics in the explainer videos are cartoons of the mechanisms; every number and every rollout comes from the paper's experiments.
+</footer>
+
+</div>
+</main>
+</body>
+</html>

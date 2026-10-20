@@ -15,6 +15,41 @@ export interface Publication {
 
 export const publications: Publication[] = [
     {
+        title: "TempoPFN: Synthetic Pre-training of Linear RNNs for Zero-shot Time Series Forecasting",
+        authors: "Vladyslav Moroshan*, Julien Siems*, Arber Zela, Timur Carstensen, Frank Hutter (*equal contribution)",
+        conference_short: "NeurIPS",
+        conference: "Advances in Neural Information Processing Systems 2026",
+        pdf: "https://arxiv.org/pdf/2510.25502",
+        code: "https://github.com/automl/TempoPFN",
+        image: "/assets/img/teaser_tempopfn.png"
+    },
+    {
+        title: "Spherical Fixed-Point Reasoners: Adaptive Loop Halting on the Hypersphere",
+        authors: "Arber Zela, Artavazd Maranjyan, Pol Puigdemont, David Berghaus, Valentyn Boreiko, Volkan Cevher",
+        conference_short: "arXiv",
+        conference: "arXiv preprint 2026",
+        pdf: "https://arxiv.org/pdf/2610.25646",
+        image: "/assets/img/teaser_sfprm.png"
+    },
+    {
+        title: "Complex KDA: Understanding and Enhancing the Expressivity of Kimi Delta Attention",
+        authors: "Julien Siems*, Riccardo Grazzi*, Korbinian Pöppel*, Jaisidh Singh, Arber Zela, Timur Carstensen, Jenia Jitsev, Frank Hutter, Volkan Cevher, Antonio Orvieto, Aaron Klein (*equal contribution)",
+        conference_short: "arXiv",
+        conference: "arXiv preprint 2026",
+        pdf: "https://arxiv.org/pdf/2609.24797",
+        code: "https://github.com/OpenEuroLLM/ComplexKDA",
+        image: "/assets/img/teaser_ckda.png"
+    },
+    {
+        title: "Evolving Many Worlds: Towards Open-Ended Discovery in Petri Dish NCA via Population-Based Training",
+        authors: "Uljad Berdica*, Jakob Foerster, Frank Hutter, Arber Zela* (*equal contribution)",
+        conference_short: "ALIFE (Oral)",
+        conference: "The 2026 Artificial Life Conference (Oral)",
+        pdf: "https://arxiv.org/pdf/2604.11248",
+        code: "https://github.com/arberzela/pbt-nca",
+        image: "/assets/img/teaser_pbtnca.png"
+    },
+    {
         title: "Improving LLM-based Global Optimization with Search Space Partitioning",
         authors: "Andrej Schwanke*, Lyubomir Ivanov*, David Salinas, Fabio Ferreira, Aaron Klein, Frank Hutter, Arber Zela* (*equal contribution)",
         conference_short: "ICLR",
@@ -24,20 +59,31 @@ export const publications: Publication[] = [
         image: "/assets/img/teaser_hollm.png"
     },
     {
+        title: "Can LLMs Beat Classical Hyperparameter Optimization Algorithms? A Study on autoresearch",
+        authors: "Fabio Ferreira*, Lucca Wobbe, Arjun Krishnakumar, Frank Hutter*, Arber Zela* (*equal supervision)",
+        conference_short: "arXiv",
+        conference: "arXiv preprint 2026",
+        pdf: "https://arxiv.org/pdf/2603.24647",
+        code: "https://github.com/ferreirafabio/autoresearch-automl",
+        page: "https://ferreirafabio.github.io/autoresearch-automl/",
+        image: "/assets/img/teaser_autoresearch.png"
+    },
+    {
+        title: "Multi-Objective Hierarchical Optimization with Large Language Models",
+        authors: "Andrej Schwanke, Lyubomir Ivanov, David Salinas, Frank Hutter, Arber Zela",
+        conference_short: "arXiv",
+        conference: "arXiv preprint 2026",
+        pdf: "https://arxiv.org/pdf/2601.13892",
+        code: "https://github.com/arberzela/mohollm",
+        image: "/assets/img/teaser_mohollm.png"
+    },
+    {
         title: "DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products",
         authors: "Julien Siems*, Timur Carstensen*, Arber Zela, Frank Hutter, Massimiliano Pontil, Riccardo Grazzi* (*equal contribution)",
         conference_short: "NeurIPS",
         conference: "Advances in Neural Information Processing Systems 2025",
         pdf: "https://arxiv.org/abs/2502.10297",
         image: "/assets/img/teaser_deltaproduct.png"
-    },
-    {
-        title: "TempoPFN: Towards Synthetic Pre-training of Linear RNNs for Zero-shot Time Series Forecasting",
-        authors: "Vladyslav Moroshan*, Julien Siems*, Arber Zela, Timur Carstensen, Frank Hutter (*equal contribution)",
-        conference_short: "AITD@EurIPS",
-        conference: "EurIPS 2025 Workshop on AI for Tabular Data",
-        pdf: "https://arxiv.org/pdf/2510.25502",
-        image: "/assets/img/teaser_tempopfn.png"
     },
     {
         title: "Regularized Neural Ensemblers",

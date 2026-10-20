@@ -1,0 +1,13 @@
+---
+// Numbered section heading used by every block on the home page.
+interface Props {
+  index: string;
+  title: string;
+}
+const { index, title } = Astro.props;
+---
+
+<div class="section-head" data-reveal>
+  <span class="idx" aria-hidden="true">{index}</span>
+  <h2>{title}</h2>
+</div>

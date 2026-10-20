@@ -1,0 +1,48 @@
+---
+// Sticky top bar shared by every page: brand, section/page tabs, theme toggle, reading progress.
+// On sidebar pages the brand only appears once the profile card has scrolled out of view
+// (src/scripts/ui.ts toggles the `show-brand` class); on wide pages it is always visible.
+import { siteConfig } from '../config';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  variant: 'sidebar' | 'wide';
+}
+const { variant } = Astro.props;
+const onBlog = Astro.url.pathname.startsWith('/blog');
+
+const tabs = [
+  { href: '/#about', label: 'About', icon: 'fa-user' },
+  { href: '/#interests', label: 'Research', icon: 'fa-flask' },
+  { href: '/#news', label: 'News', icon: 'fa-bolt' },
+  { href: '/#talks', label: 'Talks', icon: 'fa-microphone' },
+  { href: '/#publications', label: 'Publications', icon: 'fa-book-open' },
+  { href: '/blog/', label: 'Blog', icon: 'fa-pen-nib' },
+];
+---
+
+<header class="topbar" data-variant={variant}>
+  <div class="topbar-inner">
+    <a class="topbar-brand" href="/" aria-label="Home">
+      {siteConfig.avatar && <img src={siteConfig.avatar} alt="" width="32" height="32" />}
+      <span>{siteConfig.title}</span>
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <ul>
+        {tabs.map((tab) => {
+          const active = onBlog && tab.href === '/blog/';
+          return (
+            <li>
+              <a href={tab.href} class:list={[{ active }]} aria-current={active ? 'page' : undefined}>
+                <i class={`fas ${tab.icon}`} aria-hidden="true"></i>
+                <span>{tab.label}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+</header>

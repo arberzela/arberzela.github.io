@@ -5,8 +5,8 @@ export const siteConfig = {
     email: "arber.zela (at) epfl.ch",
 
     // SEO
-    keywords: "minimal light",
-    description: "The Minimal Light is a simple and elegant jekyll theme for academic personal homepage.",
+    keywords: "Arber Zela, machine learning, adaptive computation, looped transformers, test-time training, hyperparameter optimization, multi-objective optimization, neural architecture search, artificial life, cellular automata, evolutionary computation, EPFL, LIONS",
+    description: "Arber Zela is a Postdoctoral Researcher at LIONS, EPFL, working on adaptive computation (reasoning, looping, test-time training), global optimization, and artificial life.",
 
     // Links
     googleScholar: "https://scholar.google.com/citations?user=hD_6YioAAAAJ&hl=en",
@@ -16,14 +16,14 @@ export const siteConfig = {
     twitter: "https://x.com/zelaarber",
 
     // Images
-    avatar: "/assets/img/arber_small.jpg",
+    avatar: "/assets/img/arber_matterhorn.jpg",
     favicon: "/assets/img/favicon.png",
     faviconDark: "/assets/img/favicon-dark.png",
 
     // Settings
     enableFootnote: true,
     autoDarkMode: true,
-    font: "Serif", // or "Sans Serif"
+    font: "Sans Serif", // "Sans Serif" (Inter) or "Serif" (Crimson Pro) for body text
 
     // Google Analytics
     googleAnalytics: "UA-111540567-4",

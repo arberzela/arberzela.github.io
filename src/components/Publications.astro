@@ -1,54 +1,128 @@
 ---
 import { publications, type Publication } from '../data/publications';
+import { siteConfig } from '../config';
+
+type PubType = 'conference' | 'workshop' | 'journal' | 'preprint';
+const TYPE_LABELS: Record<PubType, string> = {
+  conference: 'Conference',
+  journal: 'Journal',
+  workshop: 'Workshop',
+  preprint: 'Preprint',
+};
+const JOURNAL_ABBRS = new Set(['IJCV', 'JCM', 'JMLR', 'TMLR', 'TPAMI']);
+
+// Derive a coarse venue type from the short venue name / full venue string.
+function pubType(pub: Publication): PubType {
+  const short = (pub.conference_short || '').replace(/\s*\(.*\)\s*$/, '').trim();
+  const venue = pub.conference.toLowerCase();
+  if (/arxiv|preprint/i.test(short) || venue.includes('preprint')) return 'preprint';
+  if (short.includes('@') || venue.includes('workshop')) return 'workshop';
+  if (JOURNAL_ABBRS.has(short) || venue.includes('journal')) return 'journal';
+  return 'conference';
+}
+
+// Year of the venue (last 4-digit year in the venue string).
+function pubYear(pub: Publication): string {
+  const years = pub.conference.match(/\b(19|20)\d{2}\b/g);
+  return years ? years[years.length - 1] : 'Other';
+}
+
+// Split the author string so the site owner's name can be highlighted.
+const OWNER = siteConfig.title;
+const authorParts = (authors: string) => authors.split(new RegExp(`(${OWNER})`));
+
+type Entry = Publication & { type: PubType; search: string };
+const groups: { year: string; items: Entry[] }[] = [];
+for (const pub of publications) {
+  const year = pubYear(pub);
+  let group = groups.find((g) => g.year === year);
+  if (!group) {
+    group = { year, items: [] };
+    groups.push(group);
+  }
+  group.items.push({
+    ...pub,
+    type: pubType(pub),
+    search: [pub.title, pub.authors, pub.conference, pub.conference_short, year].filter(Boolean).join(' ').toLowerCase(),
+  });
+}
+
+const presentTypes = (Object.keys(TYPE_LABELS) as PubType[]).filter((t) =>
+  groups.some((g) => g.items.some((p) => p.type === t)),
+);
 ---
 
-<h2 id="publications" style="margin: 2px 0px -15px;">Publications</h2>
+<section class="block" id="publications" data-pubs>
+  <div class="section-head" data-reveal>
+    <span class="idx" aria-hidden="true">05</span>
+    <h2>Publications</h2>
+  </div>
 
-<div class="publications">
-  <ol class="bibliography">
-    {publications.map((pub) => (
-      <li>
-        <div class="pub-row">
-          <div class="col-sm-3 abbr" style="position: relative;padding-right: 15px;padding-left: 15px;">
-            {pub.image && (
-              <>
-                <img src={pub.image} class="teaser img-fluid z-depth-1" style="width=100;height=40%" />
-                {pub.conference_short && (
-                  <abbr class="badge">{pub.conference_short}</abbr>
+  <div class="pub-tools" data-reveal>
+    <label class="pub-search">
+      <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+      <input type="search" placeholder="Search title, author or venue…" aria-label="Search publications" data-pub-search autocomplete="off" />
+    </label>
+    <div class="pub-filters" role="group" aria-label="Filter publications by type">
+      <button type="button" class="chip active" data-pub-filter="all">All</button>
+      {presentTypes.map((t) => (
+        <button type="button" class="chip" data-pub-filter={t}>{TYPE_LABELS[t]}</button>
+      ))}
+    </div>
+    <span class="pubs-meta">
+      <span data-pub-count>{publications.length} papers</span>
+      {siteConfig.googleScholar && (
+        <>
+          {' · '}
+          <a href={siteConfig.googleScholar} target="_blank" rel="noopener">Google Scholar<i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        </>
+      )}
+    </span>
+  </div>
+
+  {groups.map((group) => (
+    <div class="pub-group" data-year={group.year}>
+      <h3 class="pub-year" data-reveal><span>{group.year}</span></h3>
+      <ol class="pub-list">
+        {group.items.map((pub, i) => (
+          <li class="pub" data-type={pub.type} data-search={pub.search} data-reveal data-tilt="2.5" style={`--i:${Math.min(i, 5)}`}>
+            <div class="pub-media">
+              {pub.image && <img src={pub.image} alt="" loading="lazy" decoding="async" />}
+              {pub.conference_short && <span class="badge" data-type={pub.type}>{pub.conference_short}</span>}
+            </div>
+            <div class="pub-body">
+              <h4 class="pub-title">
+                <a href={pub.pdf || pub.link || pub.page} target="_blank" rel="noopener">{pub.title}</a>
+              </h4>
+              <p class="pub-authors">
+                {authorParts(pub.authors).map((part) => (part === OWNER ? <strong>{part}</strong> : part))}
+              </p>
+              <p class="pub-venue">{pub.conference}</p>
+              <div class="pub-links">
+                {pub.pdf && (
+                  <a class="pill" href={pub.pdf} target="_blank" rel="noopener"><i class="fas fa-file-pdf" aria-hidden="true"></i>PDF</a>
                 )}
-              </>
-            )}
-          </div>
-          <div class="col-sm-9" style="position: relative;padding-right: 15px;padding-left: 20px;">
-            <div class="title">
-              <a href={pub.pdf || pub.link}>{pub.title}</a>
+                {pub.link && (
+                  <a class="pill" href={pub.link} target="_blank" rel="noopener"><i class="fas fa-link" aria-hidden="true"></i>Paper</a>
+                )}
+                {pub.code && (
+                  <a class="pill" href={pub.code} target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i>Code</a>
+                )}
+                {pub.page && (
+                  <a class="pill" href={pub.page} target="_blank" rel="noopener"><i class="fas fa-globe" aria-hidden="true"></i>Project Page</a>
+                )}
+                {pub.bibtex && (
+                  <a class="pill" href={pub.bibtex} target="_blank" rel="noopener"><i class="fas fa-quote-right" aria-hidden="true"></i>BibTeX</a>
+                )}
+                {pub.notes && <span class="pub-note">{pub.notes}</span>}
+                {pub.others && <Fragment set:html={pub.others} />}
+              </div>
             </div>
-            <div class="author">{pub.authors}</div>
-            <div class="periodical"><em>{pub.conference}</em></div>
-            <div class="links">
-              {pub.pdf && (
-                <a href={pub.pdf} class="btn btn-sm z-depth-0" role="button" target="_blank" style="font-size:12px;">PDF</a>
-              )}
-              {pub.code && (
-                <a href={pub.code} class="btn btn-sm z-depth-0" role="button" target="_blank" style="font-size:12px;">Code</a>
-              )}
-              {pub.page && (
-                <a href={pub.page} class="btn btn-sm z-depth-0" role="button" target="_blank" style="font-size:12px;">Project Page</a>
-              )}
-              {pub.bibtex && (
-                <a href={pub.bibtex} class="btn btn-sm z-depth-0" role="button" target="_blank" style="font-size:12px;">BibTex</a>
-              )}
-              {pub.notes && (
-                <strong> <i style="color:#e74d3c">{pub.notes}</i></strong>
-              )}
-              {pub.others && (
-                <Fragment set:html={pub.others} />
-              )}
-            </div>
-          </div>
-        </div>
-        <br>
-      </li>
-    ))}
-  </ol>
-</div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  ))}
+
+  <p class="pubs-empty">No publications match your search.</p>
+</section>
