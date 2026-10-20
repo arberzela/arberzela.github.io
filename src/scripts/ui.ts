@@ -78,40 +78,43 @@ if (finePointer.matches) {
   });
 }
 
-// --- Scroll-driven state (progress bar, back-to-top, scroll-spy) --------------------------
-let navLinks: HTMLAnchorElement[] = [];
-let sections: HTMLElement[] = [];
-let navStrip: HTMLElement | null = null;
-let currentSection = '';
+// --- Scroll-driven state (progress bar, back-to-top, scroll-spies) --------------------------
+type Spy = { links: HTMLAnchorElement[]; sections: HTMLElement[]; strip: HTMLElement | null; current: string };
+let spies: Spy[] = [];
 let progressBar: HTMLElement | null = null;
 let toTop: HTMLElement | null = null;
 let queued = false;
 
-function updateSpy(y: number) {
-  if (!sections.length) return;
+function makeSpy(links: HTMLAnchorElement[], strip: HTMLElement | null): Spy | null {
+  const inPage = links.filter((a) => a.hash !== '' && a.pathname === location.pathname);
+  const sections = inPage.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1)))).filter((s): s is HTMLElement => s !== null);
+  return sections.length ? { links: inPage, sections, strip, current: '' } : null;
+}
+
+function updateSpy(spy: Spy, y: number) {
   const marker = y + window.innerHeight * 0.3;
   let current: HTMLElement | null = null;
-  for (const s of sections) {
+  for (const s of spy.sections) {
     if (s.getBoundingClientRect().top + y <= marker) current = s;
   }
-  if (y < 40) current = sections[0];
-  else if (window.innerHeight + y >= root.scrollHeight - 2) current = sections[sections.length - 1];
+  if (y < 40) current = spy.sections[0];
+  else if (window.innerHeight + y >= root.scrollHeight - 2) current = spy.sections[spy.sections.length - 1];
   const id = current ? current.id : '';
-  if (id === currentSection) return;
-  currentSection = id;
+  if (id === spy.current) return;
+  spy.current = id;
 
   let activeLink: HTMLAnchorElement | null = null;
-  for (const a of navLinks) {
-    const on = a.hash === `#${id}`;
+  for (const a of spy.links) {
+    const on = decodeURIComponent(a.hash) === `#${id}`;
     a.classList.toggle('active', on);
     if (on) activeLink = a;
   }
   // Keep the active tab in view when the tab strip scrolls horizontally (phones).
-  if (activeLink && navStrip && navStrip.scrollWidth > navStrip.clientWidth + 4) {
-    const stripRect = navStrip.getBoundingClientRect();
+  if (activeLink && spy.strip && spy.strip.scrollWidth > spy.strip.clientWidth + 4) {
+    const stripRect = spy.strip.getBoundingClientRect();
     const linkRect = activeLink.getBoundingClientRect();
-    const left = linkRect.left - stripRect.left + navStrip.scrollLeft - stripRect.width / 2 + linkRect.width / 2;
-    navStrip.scrollTo({ left, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    const left = linkRect.left - stripRect.left + spy.strip.scrollLeft - stripRect.width / 2 + linkRect.width / 2;
+    spy.strip.scrollTo({ left, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
   }
 }
 
@@ -123,7 +126,7 @@ function onScroll() {
     progressBar.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max) : 0})`;
   }
   toTop?.classList.toggle('is-visible', y > 600);
-  updateSpy(y);
+  for (const spy of spies) updateSpy(spy, y);
 }
 
 function queueScroll() {
@@ -133,6 +136,73 @@ function queueScroll() {
 }
 window.addEventListener('scroll', queueScroll, { passive: true });
 window.addEventListener('resize', queueScroll, { passive: true });
+
+// --- Copy buttons, lightbox (delegated, one-time) ----------------------------------------
+async function copyText(text: string, btn: HTMLElement) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch { /* unsupported */ }
+    ta.remove();
+  }
+  const original = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied';
+  btn.classList.add('is-copied');
+  window.setTimeout(() => {
+    btn.innerHTML = original;
+    btn.classList.remove('is-copied');
+  }, 1600);
+}
+
+function lightbox(): HTMLDialogElement {
+  let dlg = document.querySelector<HTMLDialogElement>('dialog.lightbox');
+  if (dlg) return dlg;
+  dlg = document.createElement('dialog');
+  dlg.className = 'lightbox';
+  dlg.innerHTML = '<button type="button" class="lightbox-close" aria-label="Close"><i class="fas fa-xmark" aria-hidden="true"></i></button><figure><img alt=""><figcaption></figcaption></figure>';
+  dlg.addEventListener('click', (e) => {
+    const t = e.target as Element;
+    if (t === dlg || t.closest('.lightbox-close')) dlg!.close();
+  });
+  dlg.addEventListener('close', () => root.classList.remove('lightbox-open'));
+  document.body.appendChild(dlg);
+  return dlg;
+}
+
+document.addEventListener('click', (e) => {
+  const target = e.target as Element | null;
+  if (!target) return;
+
+  const copyLink = target.closest<HTMLElement>('[data-copy-link]');
+  if (copyLink) {
+    copyText(copyLink.dataset.copyLink || location.href, copyLink);
+    return;
+  }
+  const copyBtn = target.closest<HTMLElement>('[data-copy-code]');
+  if (copyBtn) {
+    const pre = copyBtn.parentElement?.querySelector('pre');
+    if (pre) copyText(pre.innerText, copyBtn);
+    return;
+  }
+  const img = target.closest<HTMLImageElement>('.post figure img');
+  if (img && !img.closest('dialog') && typeof HTMLDialogElement !== 'undefined') {
+    e.preventDefault();
+    const dlg = lightbox();
+    const shown = dlg.querySelector('img')!;
+    shown.src = img.currentSrc || img.src;
+    shown.alt = img.alt;
+    const cap = img.closest('figure')?.querySelector('figcaption');
+    dlg.querySelector('figcaption')!.innerHTML = cap ? cap.innerHTML : '';
+    root.classList.add('lightbox-open');
+    dlg.showModal();
+  }
+});
 
 // --- Per-page wiring --------------------------------------------------------------------
 let revealObserver: IntersectionObserver | null = null;
@@ -239,6 +309,53 @@ function setupPublications() {
   );
 }
 
+// Posts: anchor links on headings, copy buttons on code blocks.
+function setupPost() {
+  const post = document.querySelector<HTMLElement>('[data-post]');
+  if (!post) return;
+  for (const h of post.querySelectorAll<HTMLElement>('h2[id], h3[id]')) {
+    if (h.querySelector('.anchor')) continue;
+    const a = document.createElement('a');
+    a.className = 'anchor';
+    a.href = `#${h.id}`;
+    a.setAttribute('aria-label', 'Link to this section');
+    a.textContent = '#';
+    h.appendChild(a);
+  }
+  for (const pre of post.querySelectorAll<HTMLElement>('pre')) {
+    if (pre.parentElement?.classList.contains('codeblock')) continue;
+    const wrap = document.createElement('div');
+    wrap.className = 'codeblock';
+    pre.replaceWith(wrap);
+    wrap.appendChild(pre);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn';
+    btn.setAttribute('data-copy-code', '');
+    btn.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy';
+    wrap.appendChild(btn);
+  }
+}
+
+// Looping videos only play while they are on screen.
+let videoObserver: IntersectionObserver | null = null;
+function setupVideos() {
+  videoObserver?.disconnect();
+  const videos = Array.from(document.querySelectorAll<HTMLVideoElement>('.post video'));
+  if (!videos.length || !('IntersectionObserver' in window)) return;
+  videoObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        const v = entry.target as HTMLVideoElement;
+        if (entry.isIntersecting) v.play().catch(() => { /* autoplay blocked: the controls remain */ });
+        else v.pause();
+      }
+    },
+    { threshold: 0.15 },
+  );
+  videos.forEach((v) => videoObserver!.observe(v));
+}
+
 let initializedFor: HTMLElement | null = null;
 
 function init() {
@@ -247,20 +364,18 @@ function init() {
 
   progressBar = document.querySelector<HTMLElement>('[data-scroll-progress]');
   toTop = document.querySelector<HTMLElement>('[data-to-top]');
-  navStrip = document.querySelector<HTMLElement>('.site-nav');
-  // Only tabs that point into the current page take part in the scroll-spy.
-  navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-nav a')).filter(
-    (a) => a.hash !== '' && a.pathname === location.pathname,
-  );
-  sections = navLinks
-    .map((a) => document.getElementById(a.hash.slice(1)))
-    .filter((s): s is HTMLElement => s !== null);
-  currentSection = '';
+  // Only links that point into the current page take part in a scroll-spy.
+  spies = [
+    makeSpy(Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-nav a')), document.querySelector<HTMLElement>('.site-nav')),
+    makeSpy(Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc a')), null),
+  ].filter((s): s is Spy => s !== null);
 
   setupReveal();
   setupBrand();
   setupNews();
   setupPublications();
+  setupPost();
+  setupVideos();
   root.classList.add('ui-ready');
   onScroll();
 }

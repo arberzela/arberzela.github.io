@@ -1,33 +1,18 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHead from '../../components/SectionHead.astro';
-import { posts } from '../../data/posts';
+import { getPosts, getPostBody, readingTime, formatDate } from '../../utils/posts';
 
-// Post bodies are plain HTML files; load them only to estimate reading time.
-const bodies = import.meta.glob('../../content/blog/*/body.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
-
-function readingTime(slug: string): number {
-  const html = bodies[`../../content/blog/${slug}/body.html`] ?? '';
-  const words = html
-    .replace(/<svg[\s\S]*?<\/svg>/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .split(/\s+/)
-    .filter(Boolean).length;
-  return Math.max(1, Math.round(words / 220));
-}
-
-const formatDate = (iso: string) =>
-  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
-
-const sorted = [...posts].sort((a, b) => b.date.localeCompare(a.date));
+const sorted = getPosts();
 ---
 
 <BaseLayout title="Blog" description="Longer write-ups of papers and ideas by Arber Zela, with the figures and animations that did not fit in the PDF.">
   <section class="block" id="blog">
     <SectionHead index="06" title="Blog" />
-    <p class="lead" data-reveal>
-      Longer write-ups of papers and ideas, with the figures and animations that did not fit in the PDF.
-    </p>
+    <div class="blog-intro" data-reveal>
+      <p class="lead">Longer write-ups of papers and ideas, with the figures and animations that did not fit in the PDF.</p>
+      <a class="pill" href="/rss.xml" title="RSS feed"><i class="fas fa-rss" aria-hidden="true"></i>RSS</a>
+    </div>
     <ul class="post-list">
       {sorted.map((post, i) => (
         <li class="post-card" data-reveal data-tilt="3" style={`--i:${i + 1}`}>
@@ -36,9 +21,9 @@ const sorted = [...posts].sort((a, b) => b.date.localeCompare(a.date));
           </a>
           <div class="body">
             <div class="meta">
-              <span>{formatDate(post.date)}</span>
+              <time datetime={post.date}>{formatDate(post.date)}</time>
               <span aria-hidden="true">·</span>
-              <span>{readingTime(post.slug)} min read</span>
+              <span>{readingTime(getPostBody(post.slug))} min read</span>
             </div>
             <h3><a href={`/blog/${post.slug}/`}>{post.title}</a></h3>
             <p class="subtitle">{post.subtitle}</p>

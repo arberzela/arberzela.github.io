@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteConfig } from '../../config';
+import { getPosts, getPostBody, preparePost, tocHtml, readingTime, formatDate } from '../../utils/posts';
+
+export function getStaticPaths() {
+  return getPosts().map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const raw = getPostBody(post.slug);
+const { html, toc } = preparePost(raw);
+const minutes = readingTime(raw);
+const tocList = tocHtml(toc);
+
+// The collapsible contents box sits at the top of the post body, after the hero.
+const inlineToc = tocList
+  ? `<details class="toc toc-inline"><summary><i class="fas fa-list-ul" aria-hidden="true"></i> Contents</summary>${tocList}</details>`
+  : '';
+const bodyHtml = inlineToc
+  ? html.includes('<div class="post-body">')
+    ? html.replace('<div class="post-body">', `<div class="post-body">${inlineToc}`)
+    : inlineToc + html
+  : html;
+
+const pageUrl = Astro.site ? new URL(`/blog/${post.slug}/`, Astro.site).href : `/blog/${post.slug}/`;
+const shareText = `${post.title}: ${post.subtitle}`;
+const share = [
+  { label: 'X', icon: 'fa-brands fa-x-twitter', href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}` },
+  { label: 'Bluesky', icon: 'fa-brands fa-bluesky', href: `https://bsky.app/intent/compose?text=${encodeURIComponent(`${shareText} ${pageUrl}`)}` },
+  { label: 'LinkedIn', icon: 'fa-brands fa-linkedin-in', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}` },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  alternativeHeadline: post.subtitle,
+  description: post.summary,
+  datePublished: post.date,
+  image: Astro.site ? new URL(post.cover, Astro.site).href : post.cover,
+  url: pageUrl,
+  keywords: post.tags.join(', '),
+  author: { '@type': 'Person', name: siteConfig.title, url: Astro.site?.href, affiliation: siteConfig.affiliation },
+  publisher: { '@type': 'Person', name: siteConfig.title },
+};
+---
+
+<BaseLayout variant="wide" title={post.title} description={post.summary} image={post.cover} hasToc={toc.length > 0}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  {toc.length > 0 && (
+    <nav class="toc toc-rail" aria-label="On this page">
+      <p class="toc-title">On this page</p>
+      <Fragment set:html={tocList} />
+    </nav>
+  )}
+
+  <article class="post" data-post>
+    <div class="wrap post-meta-bar">
+      <a href="/blog/" class="crumb"><i class="fas fa-arrow-left" aria-hidden="true"></i> All posts</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <time datetime={post.date}>{formatDate(post.date)}</time>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>{minutes} min read</span>
+      <span class="tags">{post.tags.map((tag) => <span class="tag">{tag}</span>)}</span>
+    </div>
+
+    <Fragment set:html={bodyHtml} />
+
+    <div class="wrap post-end">
+      <div class="share">
+        <span class="share-label">Share</span>
+        {share.map((s) => (
+          <a class="pill" href={s.href} target="_blank" rel="noopener" aria-label={`Share on ${s.label}`}>
+            <i class={s.icon} aria-hidden="true"></i>{s.label}
+          </a>
+        ))}
+        <button type="button" class="pill" data-copy-link={pageUrl}><i class="fas fa-link" aria-hidden="true"></i>Copy link</button>
+      </div>
+
+      <div class="author-card" data-tilt="2">
+        <img src={siteConfig.avatar} alt="" width="72" height="72" />
+        <div>
+          <p class="author-name">{siteConfig.title}</p>
+          <p class="author-role">{siteConfig.position}, {siteConfig.affiliation}</p>
+          <div class="author-links">
+            <a class="pill" href="/">Home</a>
+            <a class="pill" href="/#publications">Publications</a>
+            {siteConfig.googleScholar && <a class="pill" href={siteConfig.googleScholar} target="_blank" rel="noopener"><i class="ai ai-google-scholar" aria-hidden="true"></i>Scholar</a>}
+            {siteConfig.githubLink && <a class="pill" href={siteConfig.githubLink} target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i>GitHub</a>}
+            {siteConfig.twitter && <a class="pill" href={siteConfig.twitter} target="_blank" rel="noopener"><i class="fab fa-x-twitter" aria-hidden="true"></i>X</a>}
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

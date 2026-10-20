@@ -12,9 +12,11 @@ interface Props {
   image?: string;
   /** "sidebar": profile card + content column (home, blog index). "wide": full-width article (posts). */
   variant?: 'sidebar' | 'wide';
+  /** Wide pages only: reserve a side rail for a table of contents on large screens. */
+  hasToc?: boolean;
 }
 
-const { title = siteConfig.title, description = siteConfig.description, image, variant = 'sidebar' } = Astro.props;
+const { title = siteConfig.title, description = siteConfig.description, image, variant = 'sidebar', hasToc = false } = Astro.props;
 const fontMode = siteConfig.font === 'Serif' ? 'serif' : 'sans';
 const pageTitle = title === siteConfig.title ? `${siteConfig.title} | ${siteConfig.affiliation}` : `${title} | ${siteConfig.title}`;
 const ogImage = Astro.site ? new URL(image ?? siteConfig.avatar, Astro.site).href : (image ?? siteConfig.avatar);
@@ -40,6 +42,8 @@ const isArticle = variant === 'wide';
     <meta property="og:image" content={ogImage}>
     <meta name="twitter:card" content="summary_large_image">
     {canonical && <link rel="canonical" href={canonical}>}
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.title} — Blog`} href="/rss.xml">
+    <slot name="head" />
 
     <!-- Client-side navigation with view transitions; the background canvas persists across pages. -->
     <ClientRouter />
@@ -62,8 +66,10 @@ const isArticle = variant === 'wide';
     </script>
 
     <!-- Favicons -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" media="(prefers-color-scheme:dark)" href={siteConfig.faviconDark} type="image/png" />
     <link rel="icon" media="(prefers-color-scheme:light)" href={siteConfig.favicon} type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Academic Icons & Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
@@ -135,7 +141,7 @@ const isArticle = variant === 'wide';
         </main>
       </div>
     ) : (
-      <main class="wide-page">
+      <main class:list={['wide-page', { 'has-toc': hasToc }]}>
         <slot />
         <SiteFooter />
       </main>

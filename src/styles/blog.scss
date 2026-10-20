@@ -11,6 +11,70 @@
 }
 
 // Blog listing ----------------------------------------------------------------
+.blog-intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  .lead { flex: 1 1 320px; }
+}
+
+// Table of contents rail (lives next to the article, outside .post)
+.toc-rail, .toc-rail ol { font-family: var(--font-sans); font-size: 0.86rem; }
+.toc-rail {
+  ol { margin: 0; padding: 0; list-style: none; }
+  li > ol { margin: 0.1rem 0 0.2rem 0.95rem; border-left: 1px solid var(--border); }
+  a {
+    display: block;
+    padding: 0.3rem 0.65rem;
+    border-radius: 8px;
+    color: var(--text-2);
+    line-height: 1.35;
+    transition: color 0.2s, background-color 0.2s, padding-left 0.25s var(--ease);
+    &:hover { color: var(--text); background: var(--surface-2); }
+    &.active { color: var(--accent); background: rgba(var(--accent-rgb), 0.1); font-weight: 600; }
+  }
+}
+
+// Figure lightbox (created by src/scripts/ui.ts)
+.lightbox {
+  max-width: min(96vw, 1400px);
+  max-height: 94vh;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--surface-solid);
+  color: var(--text);
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
+  &::backdrop { background: rgba(6, 9, 16, 0.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  figure { margin: 0; display: grid; }
+  img { display: block; max-width: min(96vw, 1400px); max-height: 82vh; width: auto; height: auto; margin: 0 auto; object-fit: contain; background: #fff; }
+  figcaption { padding: 0.8rem 1.1rem 1rem; font-family: var(--font-sans); font-size: 0.88rem; line-height: 1.5; color: var(--text-2); b { color: var(--text); } }
+  figcaption:empty { display: none; }
+  .lightbox-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    &:hover { background: var(--accent); }
+  }
+  &[open] { animation: lightbox-in 0.25s var(--ease); }
+}
+@keyframes lightbox-in { from { opacity: 0; transform: scale(0.96); } }
+html.lightbox-open { overflow: hidden; }
+
 .post-list { display: grid; gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
 
 .post-card {
