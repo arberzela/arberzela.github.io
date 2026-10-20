@@ -17,7 +17,7 @@ export const siteConfig = {
 
     // Images
     avatar: "/assets/img/arber_matterhorn.jpg",
-    favicon: "/assets/img/favicon.png",
+    favicon: "favicon.svg",
     faviconDark: "/assets/img/favicon-dark.png",
 
     // Settings
