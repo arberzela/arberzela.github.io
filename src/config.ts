@@ -17,8 +17,8 @@ export const siteConfig = {
 
     // Images
     avatar: "/assets/img/arber_matterhorn.jpg",
-    favicon: "favicon.svg",
-    faviconDark: "/assets/img/favicon-dark.png",
+    favicon: "apple-touch-icon.png",
+    faviconDark: "apple-touch-icon-dark.png",
 
     // Settings
     enableFootnote: true,
