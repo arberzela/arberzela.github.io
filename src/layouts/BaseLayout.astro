@@ -12,20 +12,21 @@ interface Props {
   image?: string;
   /** "sidebar": profile card + content column (home, blog index). "wide": full-width article (posts). */
   variant?: 'sidebar' | 'wide';
-  /** Wide pages only: reserve a side rail for a table of contents on large screens. */
-  hasToc?: boolean;
 }
 
-const { title = siteConfig.title, description = siteConfig.description, image, variant = 'sidebar', hasToc = false } = Astro.props;
+const { title = siteConfig.title, description = siteConfig.description, image, variant = 'sidebar' } = Astro.props;
 const fontMode = siteConfig.font === 'Serif' ? 'serif' : 'sans';
 const pageTitle = title === siteConfig.title ? `${siteConfig.title} | ${siteConfig.affiliation}` : `${title} | ${siteConfig.title}`;
 const ogImage = Astro.site ? new URL(image ?? siteConfig.avatar, Astro.site).href : (image ?? siteConfig.avatar);
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 const isArticle = variant === 'wide';
+// The blog section (listing + posts) uses the dark article palette by default.
+const section = Astro.url.pathname.startsWith('/blog') ? 'blog' : undefined;
+const page = isArticle ? 'post' : undefined;
 ---
 
 <!DOCTYPE html>
-<html lang="en" data-font={fontMode} data-theme={siteConfig.autoDarkMode ? undefined : 'light'}>
+<html lang="en" data-font={fontMode} data-theme={siteConfig.autoDarkMode ? undefined : 'light'} data-section={section} data-page={page}>
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -57,6 +58,7 @@ const isArticle = variant === 'wide';
         try {
           var t = localStorage.getItem('theme');
           if (t === 'dark' || t === 'light') d.setAttribute('data-theme', t);
+          else if (d.getAttribute('data-section') === 'blog') d.setAttribute('data-theme', 'dark');
         } catch (e) {}
         // Safety net: if the UI script never runs, show everything after a moment.
         setTimeout(function () {
@@ -141,7 +143,7 @@ const isArticle = variant === 'wide';
         </main>
       </div>
     ) : (
-      <main class:list={['wide-page', { 'has-toc': hasToc }]}>
+      <main class="wide-page">
         <slot />
         <SiteFooter />
       </main>

@@ -67,19 +67,17 @@ export function preparePost(html: string): { html: string; toc: TocEntry[] } {
     return `<h${lvl}${attrsWithId}>${inner}</h${lvl}>`;
   });
   const lazy = out.replace(/<img\b(?![^>]*\bloading=)([^>]*)>/g, '<img loading="lazy" decoding="async"$1>');
-  return { html: lazy, toc };
+  // Display formulas were pre-rendered with fixed pixel sizes for 19px text; express them in em
+  // so they scale with the article's font size.
+  const sized = lazy.replace(
+    /(<div class="math-display"[^>]*>\s*<svg[^>]*?)width="([\d.]+)px" height="([\d.]+)px"/g,
+    (_m, head: string, w: string, h: string) => `${head}width="${(Number(w) / 19).toFixed(3)}em" height="${(Number(h) / 19).toFixed(3)}em"`,
+  );
+  return { html: sized, toc };
 }
 
 export function tocHtml(toc: TocEntry[]): string {
-  // Two levels: h2 items, each with an optional nested list of the h3s that follow it.
-  type Item = { entry: TocEntry; children: TocEntry[] };
-  const items: Item[] = [];
-  for (const entry of toc) {
-    if (entry.level === 3 && items.length) items[items.length - 1].children.push(entry);
-    else items.push({ entry, children: [] });
-  }
-  const link = (e: TocEntry) => `<a href="#${e.id}">${e.text}</a>`;
-  return `<ol>${items
-    .map(({ entry, children }) => `<li>${link(entry)}${children.length ? `<ol>${children.map((c) => `<li>${link(c)}</li>`).join('')}</ol>` : ''}</li>`)
-    .join('')}</ol>`;
+  // Flat list; sub-sections are indented via their class (as on the reference article layout).
+  if (!toc.length) return '';
+  return `<ul>${toc.map((e) => `<li class="toc-h${e.level}"><a href="#${e.id}">${e.text}</a></li>`).join('')}</ul>`;
 }

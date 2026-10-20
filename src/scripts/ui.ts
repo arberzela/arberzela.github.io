@@ -27,18 +27,39 @@ function toggleTheme() {
 // Client-side navigation replaces the <html> attributes with the new page's; restore the ones we own.
 document.addEventListener('astro:after-swap', () => {
   root.classList.add('js');
+  let t: string | null = null;
   try {
-    const t = localStorage.getItem('theme');
-    if (t === 'dark' || t === 'light') root.setAttribute('data-theme', t);
+    t = localStorage.getItem('theme');
   } catch {
     /* ignore */
   }
+  if (t === 'dark' || t === 'light') root.setAttribute('data-theme', t);
+  else if (root.dataset.section === 'blog') root.setAttribute('data-theme', 'dark');
 });
 
 // --- One-time delegated handlers -----------------------------------------------------
+function setTocDrawer(open: boolean) {
+  const sidebar = document.getElementById('toc-sidebar');
+  const btn = document.querySelector<HTMLElement>('[data-toc-toggle]');
+  if (!sidebar) return;
+  sidebar.classList.toggle('open', open);
+  btn?.classList.toggle('active', open);
+  btn?.setAttribute('aria-expanded', String(open));
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.querySelector('.toc-sidebar.open')) setTocDrawer(false);
+});
+
 document.addEventListener('click', (e) => {
   const target = e.target as Element | null;
   if (!target) return;
+  if (target.closest('[data-toc-toggle]')) {
+    setTocDrawer(!document.querySelector('.toc-sidebar.open'));
+    return;
+  }
+  const openDrawer = document.querySelector('.toc-sidebar.open');
+  if (openDrawer && (!openDrawer.contains(target) || target.closest('a'))) setTocDrawer(false);
   if (target.closest('[data-theme-toggle]')) {
     toggleTheme();
     return;
@@ -107,6 +128,7 @@ function updateSpy(spy: Spy, y: number) {
   for (const a of spy.links) {
     const on = decodeURIComponent(a.hash) === `#${id}`;
     a.classList.toggle('active', on);
+    a.parentElement?.classList.toggle('active', on);
     if (on) activeLink = a;
   }
   // Keep the active tab in view when the tab strip scrolls horizontally (phones).
@@ -367,7 +389,7 @@ function init() {
   // Only links that point into the current page take part in a scroll-spy.
   spies = [
     makeSpy(Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-nav a')), document.querySelector<HTMLElement>('.site-nav')),
-    makeSpy(Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc a')), null),
+    makeSpy(Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc-sidebar a')), null),
   ].filter((s): s is Spy => s !== null);
 
   setupReveal();

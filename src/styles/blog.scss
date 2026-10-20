@@ -2,13 +2,7 @@
 // Wide pages (blog posts) and the blog listing cards. The top bar lives in minimal-light.scss.
 // =============================================================================
 
-.wide-page {
-  max-width: 1020px;
-  margin: 0 auto;
-  padding: 0.5rem 0 3rem;
-
-  .site-footer { max-width: 980px; margin: 2.5rem auto 0; padding: 1.25rem 20px 0; }
-}
+.wide-page { padding: 0 0 2rem; }
 
 // Blog listing ----------------------------------------------------------------
 .blog-intro {
@@ -19,23 +13,6 @@
   gap: 0.75rem 1rem;
   margin-bottom: 1.25rem;
   .lead { flex: 1 1 320px; }
-}
-
-// Table of contents rail (lives next to the article, outside .post)
-.toc-rail, .toc-rail ol { font-family: var(--font-sans); font-size: 0.86rem; }
-.toc-rail {
-  ol { margin: 0; padding: 0; list-style: none; }
-  li > ol { margin: 0.1rem 0 0.2rem 0.95rem; border-left: 1px solid var(--border); }
-  a {
-    display: block;
-    padding: 0.3rem 0.65rem;
-    border-radius: 8px;
-    color: var(--text-2);
-    line-height: 1.35;
-    transition: color 0.2s, background-color 0.2s, padding-left 0.25s var(--ease);
-    &:hover { color: var(--text); background: var(--surface-2); }
-    &.active { color: var(--accent); background: rgba(var(--accent-rgb), 0.1); font-weight: 600; }
-  }
 }
 
 // Figure lightbox (created by src/scripts/ui.ts)

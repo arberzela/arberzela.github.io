@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SfprmHero from '../../components/heroes/SfprmHero.astro';
+import CoverHero from '../../components/heroes/CoverHero.astro';
 import { siteConfig } from '../../config';
 import { getPosts, getPostBody, preparePost, tocHtml, readingTime, formatDate } from '../../utils/posts';
 
@@ -12,16 +14,6 @@ const raw = getPostBody(post.slug);
 const { html, toc } = preparePost(raw);
 const minutes = readingTime(raw);
 const tocList = tocHtml(toc);
-
-// The collapsible contents box sits at the top of the post body, after the hero.
-const inlineToc = tocList
-  ? `<details class="toc toc-inline"><summary><i class="fas fa-list-ul" aria-hidden="true"></i> Contents</summary>${tocList}</details>`
-  : '';
-const bodyHtml = inlineToc
-  ? html.includes('<div class="post-body">')
-    ? html.replace('<div class="post-body">', `<div class="post-body">${inlineToc}`)
-    : inlineToc + html
-  : html;
 
 const pageUrl = Astro.site ? new URL(`/blog/${post.slug}/`, Astro.site).href : `/blog/${post.slug}/`;
 const shareText = `${post.title}: ${post.subtitle}`;
@@ -46,55 +38,69 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout variant="wide" title={post.title} description={post.summary} image={post.cover} hasToc={toc.length > 0}>
+<BaseLayout variant="wide" title={post.title} description={post.summary} image={post.cover}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
 
-  {toc.length > 0 && (
-    <nav class="toc toc-rail" aria-label="On this page">
-      <p class="toc-title">On this page</p>
-      <Fragment set:html={tocList} />
-    </nav>
-  )}
+  {post.hero === 'sfprm-sphere' ? <SfprmHero paper={post.paper} code={post.code} /> : <CoverHero post={post} />}
 
-  <article class="post" data-post>
-    <div class="wrap post-meta-bar">
-      <a href="/blog/" class="crumb"><i class="fas fa-arrow-left" aria-hidden="true"></i> All posts</a>
-      <span class="sep" aria-hidden="true">·</span>
-      <time datetime={post.date}>{formatDate(post.date)}</time>
-      <span class="sep" aria-hidden="true">·</span>
-      <span>{minutes} min read</span>
-      <span class="tags">{post.tags.map((tag) => <span class="tag">{tag}</span>)}</span>
-    </div>
-
-    <Fragment set:html={bodyHtml} />
-
-    <div class="wrap post-end">
-      <div class="share">
-        <span class="share-label">Share</span>
-        {share.map((s) => (
-          <a class="pill" href={s.href} target="_blank" rel="noopener" aria-label={`Share on ${s.label}`}>
-            <i class={s.icon} aria-hidden="true"></i>{s.label}
-          </a>
-        ))}
-        <button type="button" class="pill" data-copy-link={pageUrl}><i class="fas fa-link" aria-hidden="true"></i>Copy link</button>
+  <div class="article-layout">
+    <article class="post" data-post>
+      <div class="post-meta-bar">
+        <a href="/blog/" class="crumb"><i class="fas fa-arrow-left" aria-hidden="true"></i> All posts</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <time datetime={post.date}>{formatDate(post.date)}</time>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>{minutes} min read</span>
+        <span class="tags">{post.tags.map((tag) => <span class="tag">{tag}</span>)}</span>
       </div>
 
-      <div class="author-card" data-tilt="2">
-        <img src={siteConfig.avatar} alt="" width="72" height="72" />
-        <div>
-          <p class="author-name">{siteConfig.title}</p>
-          <p class="author-role">{siteConfig.position}, {siteConfig.affiliation}</p>
-          <div class="author-links">
-            <a class="pill" href="/">Home</a>
-            <a class="pill" href="/#publications">Publications</a>
-            {siteConfig.googleScholar && <a class="pill" href={siteConfig.googleScholar} target="_blank" rel="noopener"><i class="ai ai-google-scholar" aria-hidden="true"></i>Scholar</a>}
-            {siteConfig.githubLink && <a class="pill" href={siteConfig.githubLink} target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i>GitHub</a>}
-            {siteConfig.twitter && <a class="pill" href={siteConfig.twitter} target="_blank" rel="noopener"><i class="fab fa-x-twitter" aria-hidden="true"></i>X</a>}
+      <Fragment set:html={html} />
+
+      <div class="post-end">
+        <div class="share">
+          <span class="share-label">Share</span>
+          {share.map((s) => (
+            <a class="pill" href={s.href} target="_blank" rel="noopener" aria-label={`Share on ${s.label}`}>
+              <i class={s.icon} aria-hidden="true"></i>{s.label}
+            </a>
+          ))}
+          <button type="button" class="pill" data-copy-link={pageUrl}><i class="fas fa-link" aria-hidden="true"></i>Copy link</button>
+        </div>
+
+        <div class="author-card">
+          <img src={siteConfig.avatar} alt="" width="64" height="64" />
+          <div>
+            <p class="author-name">{siteConfig.title}</p>
+            <p class="author-role">{siteConfig.position}, {siteConfig.affiliation}</p>
+            <div class="author-links">
+              <a class="pill" href="/">Home</a>
+              <a class="pill" href="/#publications">Publications</a>
+              {siteConfig.googleScholar && <a class="pill" href={siteConfig.googleScholar} target="_blank" rel="noopener"><i class="ai ai-google-scholar" aria-hidden="true"></i>Scholar</a>}
+              {siteConfig.githubLink && <a class="pill" href={siteConfig.githubLink} target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i>GitHub</a>}
+              {siteConfig.twitter && <a class="pill" href={siteConfig.twitter} target="_blank" rel="noopener"><i class="fab fa-x-twitter" aria-hidden="true"></i>X</a>}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </article>
+    </article>
+
+    {toc.length > 0 && (
+      <aside class="toc-sidebar" id="toc-sidebar" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <Fragment set:html={tocList} />
+      </aside>
+    )}
+  </div>
+
+  {toc.length > 0 && (
+    <button type="button" class="btn-toc-toggle" data-toc-toggle aria-controls="toc-sidebar" aria-expanded="false" aria-label="Table of contents">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+  )}
 </BaseLayout>

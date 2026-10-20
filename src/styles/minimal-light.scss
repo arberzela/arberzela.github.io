@@ -95,6 +95,30 @@
   :root:not([data-theme="light"]) { @include dark-tokens; }
 }
 
+// The blog section uses a slightly different dark palette (slate + sky accent) to match its posts.
+@mixin blog-dark-tokens {
+  --bg: #0b0f19;
+  --bg-rgb: 11, 15, 25;
+  --surface: rgba(15, 23, 42, 0.6);
+  --surface-solid: #0f172a;
+  --surface-2: rgba(255, 255, 255, 0.03);
+  --text: #e2e8f0;
+  --text-2: #cbd5e1;
+  --muted: #94a3b8;
+  --border: #1e293b;
+  --border-strong: #334155;
+  --accent: #38bdf8;
+  --accent-rgb: 56, 189, 248;
+  --glow: rgba(56, 189, 248, 0.35);
+  --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -16px rgba(56, 189, 248, 0.22);
+  --code-bg: #1e293b;
+  --blob-1: rgba(56, 189, 248, 0.14);
+}
+:root[data-section="blog"][data-theme="dark"] { @include blog-dark-tokens; }
+@media (prefers-color-scheme: dark) {
+  :root[data-section="blog"]:not([data-theme="light"]) { @include blog-dark-tokens; }
+}
+
 // -----------------------------------------------------------------------------
 // 2. Base + background
 // -----------------------------------------------------------------------------

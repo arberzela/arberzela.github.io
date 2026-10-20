@@ -184,6 +184,8 @@ function start(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
   // ~30 fps is plenty for slow drift and halves the CPU cost on laptops.
   const frame = (now: number) => {
     raf = requestAnimationFrame(frame);
+    // Post pages hide this background (they have their own hero illustration).
+    if (document.documentElement.dataset.page === 'post') return;
     if (now - lastFrame < 30) return;
     lastFrame = now;
     step(now);
