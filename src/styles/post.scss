@@ -76,7 +76,7 @@ $mono: SFMono-Regular, Consolas, Monaco, "Liberation Mono", Menlo, monospace;
   --bg-rgb: var(--p-bg-rgb);
 
   // Flat page: the hero carries the illustration, so the site background is hidden here.
-  .bg-blobs, #bg-canvas { display: none; }
+  #bg-canvas { display: none; }
 }
 :root[data-page="post"][data-theme="dark"] { @include post-dark; }
 @media (prefers-color-scheme: dark) {
@@ -585,6 +585,12 @@ $mono: SFMono-Regular, Consolas, Monaco, "Liberation Mono", Menlo, monospace;
     .author-name { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--p-heading); }
     .author-role { margin: 2px 0 10px; font-size: 14px; line-height: 1.45; color: var(--p-muted); }
     .author-links { display: flex; flex-wrap: wrap; gap: 6px; }
+  }
+  .design-credit {
+    margin: 20px 0 0;
+    font-size: 13px;
+    color: var(--p-faint);
+    a { color: var(--p-muted); text-decoration: underline; text-underline-offset: 2px; }
   }
 }
 

@@ -27,17 +27,18 @@
   --accent-2: #7c3aed;
   --accent-2-rgb: 124, 58, 237;
   --accent-3: #0891b2;
+  --accent-3-rgb: 8, 145, 178;
   --shadow: 0 1px 2px rgba(23, 27, 38, 0.04), 0 12px 32px -12px rgba(23, 27, 38, 0.18);
   --shadow-hover: 0 2px 4px rgba(23, 27, 38, 0.05), 0 24px 48px -16px rgba(37, 99, 235, 0.3);
   --glow: rgba(37, 99, 235, 0.35);
   --code-bg: rgba(23, 27, 38, 0.05);
   --img-bg: #ffffff;
-  // background canvas + blobs
-  --line-alpha: 0.16;
-  --node-alpha: 0.55;
-  --blob-1: rgba(37, 99, 235, 0.16);
-  --blob-2: rgba(124, 58, 237, 0.13);
-  --blob-3: rgba(8, 145, 178, 0.13);
+  // ASCII space background (src/scripts/background.ts): tile opacity, opacity behind the text
+  // column, grid lines, constellation lines
+  --ascii-opacity: 0.9;
+  --ascii-faint: 0.3;
+  --ascii-grid: 0.055;
+  --constellation-alpha: 0.16;
 }
 
 @mixin dark-tokens {
@@ -57,16 +58,16 @@
   --accent-2: #a78bfa;
   --accent-2-rgb: 167, 139, 250;
   --accent-3: #22d3ee;
+  --accent-3-rgb: 34, 211, 238;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -16px rgba(0, 0, 0, 0.6);
   --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -16px rgba(96, 165, 250, 0.25);
   --glow: rgba(96, 165, 250, 0.4);
   --code-bg: rgba(255, 255, 255, 0.06);
   --img-bg: #ffffff;
-  --line-alpha: 0.22;
-  --node-alpha: 0.75;
-  --blob-1: rgba(59, 130, 246, 0.22);
-  --blob-2: rgba(139, 92, 246, 0.2);
-  --blob-3: rgba(34, 211, 238, 0.15);
+  --ascii-opacity: 0.85;
+  --ascii-faint: 0.3;
+  --ascii-grid: 0.045;
+  --constellation-alpha: 0.22;
 }
 
 // Emit rules for dark mode: explicit toggle, or system preference when no explicit light choice.
@@ -112,7 +113,6 @@
   --glow: rgba(56, 189, 248, 0.35);
   --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -16px rgba(56, 189, 248, 0.22);
   --code-bg: #1e293b;
-  --blob-1: rgba(56, 189, 248, 0.14);
 }
 :root[data-section="blog"][data-theme="dark"] { @include blog-dark-tokens; }
 @media (prefers-color-scheme: dark) {
@@ -165,37 +165,7 @@ code, pre { font-family: var(--font-mono); font-size: 0.9em; }
 code { background: var(--code-bg); padding: 0.1em 0.4em; border-radius: 6px; }
 ::selection { background: rgba(var(--accent-rgb), 0.25); }
 
-// Soft colour fields drifting behind everything.
-.bg-blobs {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  overflow: hidden;
-  pointer-events: none;
-
-  span {
-    position: absolute;
-    width: 58vmax;
-    height: 58vmax;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, var(--blob-1), transparent 72%);
-    animation: blob-drift 28s ease-in-out infinite alternate;
-    will-change: transform;
-  }
-  span:nth-child(1) { top: -22vmax; left: -16vmax; }
-  span:nth-child(2) {
-    right: -14vmax; bottom: -26vmax;
-    background: radial-gradient(closest-side, var(--blob-2), transparent 72%);
-    animation-duration: 34s; animation-delay: -9s;
-  }
-  span:nth-child(3) {
-    top: 28vh; left: 38vw; width: 42vmax; height: 42vmax;
-    background: radial-gradient(closest-side, var(--blob-3), transparent 72%);
-    animation-duration: 40s; animation-delay: -18s;
-  }
-}
-
-// Constellation canvas (drawn by src/scripts/background.ts).
+// ASCII space canvas (drawn by src/scripts/background.ts, scene in src/scripts/ascii/space.ts).
 #bg-canvas {
   position: fixed;
   inset: 0;
@@ -558,37 +528,8 @@ html.js.reveal-all .section-head::after { transform: scaleX(1); }
   }
   &:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: rgba(var(--accent-rgb), 0.35); }
 
-  .icon {
-    display: grid;
-    place-items: center;
-    width: 42px;
-    height: 42px;
-    margin-bottom: 0.8rem;
-    border-radius: 11px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #fff;
-    font-size: 1.05rem;
-    box-shadow: 0 10px 22px -10px var(--glow);
-    transition: transform 0.4s var(--ease);
-  }
-  &:hover .icon { transform: translateY(-2px) rotate(-8deg) scale(1.06); }
   h3 { margin: 0 0 0.3rem; font-family: var(--font-display); font-size: 1.02rem; font-weight: 700; color: var(--text); }
   p { margin: 0; font-size: 0.93rem; line-height: 1.55; color: var(--text-2); }
-
-  // Big faint icon in the corner.
-  .watermark {
-    position: absolute;
-    right: -14px;
-    bottom: -18px;
-    font-size: 6rem;
-    line-height: 1;
-    color: var(--accent);
-    opacity: 0.06;
-    transform: rotate(-12deg);
-    transition: transform 0.6s var(--ease), opacity 0.3s;
-    pointer-events: none;
-  }
-  &:hover .watermark { opacity: 0.12; transform: rotate(-4deg) scale(1.08); }
 }
 
 // News timeline
@@ -665,6 +606,7 @@ html.js.reveal-all .timeline li::before { transform: scale(1); }
   color: var(--muted);
 
   a { color: var(--text-2); }
+  .footer-credit { flex-basis: 100%; }
 }
 
 // -----------------------------------------------------------------------------
@@ -726,10 +668,6 @@ html.js.reveal-all .timeline li::before { transform: scale(1); }
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
-}
-@keyframes blob-drift {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to { transform: translate3d(6vw, 5vh, 0) scale(1.12); }
 }
 
 // Scroll reveal: only when JS is running, and only until the element is in view.
@@ -808,7 +746,7 @@ html.js.reveal-all [data-reveal] { opacity: 1; transform: none; }
 }
 
 @media print {
-  .bg-blobs, #bg-canvas, .topbar, .to-top, .show-more { display: none !important; }
+  #bg-canvas, .topbar, .to-top, .show-more { display: none !important; }
   .wrapper { display: block; padding: 0; }
   .profile, .interest { box-shadow: none; }
   html.js [data-reveal] { opacity: 1; transform: none; }

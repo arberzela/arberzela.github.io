@@ -1,6 +1,7 @@
 ---
 import { siteConfig } from '../config';
 const year = new Date().getFullYear();
+const isHome = Astro.url.pathname === '/';
 ---
 
 <footer class="site-footer">
@@ -9,6 +10,12 @@ const year = new Date().getFullYear();
     <span>
       Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>, inspired by
       <a href="https://github.com/yaoyao-liu/minimal-light" target="_blank" rel="noopener">Minimal Light</a>.
+    </span>
+  )}
+  {isHome && (
+    <span class="footer-credit">
+      The space turtle design was inspired by
+      <a href="https://x.com/stackedlol/status/2112257760628986188" target="_blank" rel="noopener">this ASCII animation by @stackedlol</a>.
     </span>
   )}
 </footer>

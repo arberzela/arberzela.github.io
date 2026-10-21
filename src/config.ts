@@ -10,7 +10,6 @@ export const siteConfig = {
 
     // Links
     googleScholar: "https://scholar.google.com/citations?user=hD_6YioAAAAJ&hl=en",
-    cvLink: "/assets/files/curriculum_vitae.pdf",
     githubLink: "https://github.com/arberzela",
     linkedin: "https://www.linkedin.com/in/arber-zela-ba95a2145",
     twitter: "https://x.com/zelaarber",

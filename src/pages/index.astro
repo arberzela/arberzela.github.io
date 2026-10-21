@@ -4,9 +4,9 @@ import SectionHead from '../components/SectionHead.astro';
 import Publications from '../components/Publications.astro';
 
 const interests = [
-  { icon: 'fa-solid fa-rotate', title: 'Adaptive Computation', text: 'Reasoning, looping, test-time training' },
-  { icon: 'fa-solid fa-bullseye', title: 'Global Optimization', text: 'Hyperparameter optimization, multi-objective optimization, architecture search' },
-  { icon: 'fa-solid fa-dna', title: 'Artificial Life', text: 'Cellular automata, evolutionary computation' },
+  { title: 'Adaptive Computation', text: 'Reasoning, looping, test-time training' },
+  { title: 'Global Optimization', text: 'Hyperparameter optimization, multi-objective optimization, architecture search' },
+  { title: 'Artificial Life', text: 'Cellular automata, evolutionary computation' },
 ];
 
 // Newest first. `text` is rendered as HTML, so inline links/emphasis are allowed.
@@ -43,10 +43,8 @@ const news = [
     <ul class="interests">
       {interests.map((item, i) => (
         <li class="interest" data-reveal data-tilt="6" style={`--i:${i}`}>
-          <span class="icon"><i class={item.icon} aria-hidden="true"></i></span>
           <h3>{item.title}</h3>
           <p>{item.text}</p>
-          <i class={`watermark ${item.icon}`} aria-hidden="true"></i>
         </li>
       ))}
     </ul>
